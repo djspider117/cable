@@ -1,0 +1,153 @@
+﻿<UserControl x:Class="Cable.App.Views.Controls.LibraryControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Cable.App.Views.Controls" 
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <DataTemplate x:Key="LibraryItemDataTemplate">
+            <Border Margin="0,0,0,7"
+                    Height="27"
+                    CornerRadius="12">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#22FFFFFF"/>
+                                <Setter Property="TextBlock.Foreground" Value="{DynamicResource AccentTextFillColorPrimaryBrush}" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <Grid MinHeight="26">
+                    <TextBlock Text="{Binding Name}" 
+                               VerticalAlignment="Center"
+                               Margin="10,0"/>
+        
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right">
+        
+                        <ui:Button Appearance="Transparent" Icon="{ui:SymbolIcon Add20}" 
+                                   BorderThickness="0">
+                            <ui:Button.Style>
+                                <Style TargetType="{x:Type ui:Button}" BasedOn="{StaticResource DefaultUiButtonStyle}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ContentPresenter}, Path=IsMouseOver}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:Button.Style>
+                        </ui:Button>
+        
+                        <ToggleButton Background="Transparent"
+                                  BorderThickness="0">
+                        <ToggleButton.Style>
+                            <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource DefaultToggleButtonStyle}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Setter Property="Content">
+                                    <Setter.Value>
+                                        <ui:SymbolIcon Symbol="Heart20" />
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ContentPresenter}, Path=IsMouseOver}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+        
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Content">
+                                            <Setter.Value>
+                                                <ui:SymbolIcon Symbol="Heart20" Filled="True"/>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Trigger>
+        
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Foreground" Value="Red"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" MinHeight="300"/>
+        </Grid.RowDefinitions>
+
+        <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                   Grid.RowSpan="2" />
+
+        <TextBlock Text="Node Library" Padding="8" TextAlignment="Center"/>
+
+        <ui:TextBox Grid.Row="1" Margin="8,8,8,20" Icon="{ui:SymbolIcon Search20}" />
+
+
+        <Border Background="#33000000" Grid.Row="2">
+            <ui:PassiveScrollViewer>
+                <ItemsControl x:Name="lvLibItems" 
+                              ItemsSource="{Binding LibraryItems}"
+                              ItemTemplate="{StaticResource LibraryItemDataTemplate}"
+                              Margin="8">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Orientation="Vertical" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.HeaderTemplate>
+                                <DataTemplate>
+                                    <TextBlock FontWeight="Bold" FontSize="14" Text="{Binding Name, Converter={StaticResource AllCapsConverter}}"
+                                               Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"
+                                               Margin="0,0,0,10"/>
+                                </DataTemplate>
+                            </GroupStyle.HeaderTemplate>
+                        </GroupStyle>
+                    </ItemsControl.GroupStyle>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="HorizontalAlignment" Value="Stretch" />
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                </ItemsControl>
+            </ui:PassiveScrollViewer>
+        </Border>
+
+        <GridSplitter HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Grid.Row="2"
+                      Background="Black" Height="2" />
+
+        <Border Background="#33000000" Grid.Row="3">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock FontWeight="Bold" FontSize="14" Text="FAVORITES"
+                           Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"
+                           Margin="7,10,0,10"/>
+
+                <ScrollViewer Grid.Row="1">
+                    <ItemsControl x:Name="lvFavs"
+                                  ItemTemplate="{StaticResource LibraryItemDataTemplate}">
+                        
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+    </Grid>
+</UserControl>
