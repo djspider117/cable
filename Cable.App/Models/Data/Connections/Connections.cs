@@ -3,5 +3,5 @@ using System.Numerics;
 
 namespace Cable.App.Models.Data.Connections;
 
-public partial class FloatConnection(INodeData source, INodeData target) : DataConnection<float>(source, target) { }
-public partial class Float2Connection(INodeData source, INodeData target) : DataConnection<Vector2>(source, target) { }
+public partial class FloatConnection(INodeData source, INodeData target, string? propName = null) : DataConnection<float>(source, target, propName) { }
+public partial class Float2Connection(INodeData source, INodeData target, string? propName = null) : DataConnection<Vector2>(source, target, propName) { }

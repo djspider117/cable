@@ -37,9 +37,9 @@
         </StackPanel>
 
         <Canvas x:Name="pnlNodeContainer" Background="#55000000" Grid.Row="1"
-                ClipToBounds="True">
+                ClipToBounds="True" />
 
-        </Canvas>
+        <Canvas x:Name="pnlConnectionsContainer" Grid.Row="1" ClipToBounds="True" />
 
         <Canvas x:Name="pnlOverlayCanvas" Grid.Row="1">
             <local:NodeEditor x:Name="nodeEditor" Canvas.Left="1350" Canvas.Top="25"/>

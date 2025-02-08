@@ -58,6 +58,7 @@ public class PropertyEditorGenerator : IIncrementalGenerator
         var sb = new StringBuilder();
         sb.AppendLine("using Cable.App.Extensions;");
         sb.AppendLine("using Cable.App.Models.Data;");
+        sb.AppendLine("using Cable.App.Models.Data.Connections;");
         sb.AppendLine("using Cable.App.ViewModels.Data.PropertyEditors;");
         sb.AppendLine();
         sb.AppendLine($"namespace {namespaceName}");
@@ -70,9 +71,42 @@ public class PropertyEditorGenerator : IIncrementalGenerator
         {
             var fieldName = field.Name;
             var propName = field.Name.Capitalize();
+            var editorType = field.GetAttributes()
+                .FirstOrDefault(a => a.AttributeClass?.Name == "PropertyEditorAttribute")
+                ?.AttributeClass?.TypeArguments.FirstOrDefault()?.ToDisplayString() ?? "UnknownEditor";
+
             var connectionName = $"{propName}Connection";
+            sb.AppendLine($"        private IConnection<{field.Type.ToDisplayString()}>? _{connectionName};");
+            sb.AppendLine($"        private {editorType}? _{propName}Editor;");
             sb.AppendLine($"        public {field.Type.ToDisplayString()} {propName} => {connectionName} == null ? {fieldName} : {connectionName}.GetValue();");
-            sb.AppendLine($"        public IConnection<{field.Type.ToDisplayString()}>? {connectionName} {{get; set;}}");
+            sb.AppendLine($"        public IConnection<{field.Type.ToDisplayString()}>? {connectionName}");
+            sb.AppendLine($"        {{");
+            sb.AppendLine($"            get => _{connectionName};");
+            sb.AppendLine($"            set");
+            sb.AppendLine($"            {{");
+            sb.AppendLine($"                _{connectionName} = value;");
+            sb.AppendLine($"                {propName}Editor.IsConnected = value != null;");
+            sb.AppendLine($"                if (_{connectionName} != null)");
+            sb.AppendLine($"                {{");
+            sb.AppendLine($"                    {propName}Editor.DataGetter = () => _{connectionName}.GetValue();");
+            sb.AppendLine($"                    _{connectionName}.PropertyChanged += {connectionName}_PropertyChanged;");
+            sb.AppendLine($"                    OnPropertyChanged();");
+            sb.AppendLine($"                }}");
+            sb.AppendLine($"            }}");
+            sb.AppendLine($"        }}");
+            sb.AppendLine($"        private void {connectionName}_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)");
+            sb.AppendLine($"        {{");
+            sb.AppendLine($"            {propName}Editor.PushPropertyChanged();");
+            sb.AppendLine($"        }}");
+            sb.AppendLine($"        public {editorType} {propName}Editor");
+            sb.AppendLine($"        {{");
+            sb.AppendLine($"            get");
+            sb.AppendLine($"            {{");
+            sb.AppendLine($"                if (_{propName}Editor == null)");
+            sb.AppendLine($"                    _{propName}Editor = new(this, \"{fieldName.Capitalize()}\", () => {fieldName}, x => {{ {fieldName} = x; OnPropertyChanged(\"{propName}\"); }});");
+            sb.AppendLine($"                return _{propName}Editor;");
+            sb.AppendLine($"            }}");
+            sb.AppendLine($"        }}");
             sb.AppendLine();
         }
 
@@ -83,11 +117,8 @@ public class PropertyEditorGenerator : IIncrementalGenerator
         foreach (var field in fields)
         {
             var fieldName = field.Name;
-            var editorType = field.GetAttributes()
-                .FirstOrDefault(a => a.AttributeClass?.Name == "PropertyEditorAttribute")
-                ?.AttributeClass?.TypeArguments.FirstOrDefault()?.ToDisplayString() ?? "UnknownEditor";
-
-            sb.AppendLine($"            yield return new {editorType}(\"{fieldName.Capitalize()}\", () => {fieldName}, x => {fieldName} = x);");
+            var propName = field.Name.Capitalize();
+            sb.AppendLine($"            yield return {propName}Editor;");
         }
 
         sb.AppendLine("        }");

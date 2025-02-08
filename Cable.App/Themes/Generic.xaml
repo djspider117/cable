@@ -33,6 +33,7 @@
     </Style>
 
     <converters:NodeConnectorVisibilityConverter x:Key="NodeConnectorVisibilityConverter" />
+    <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
 
     <Style TargetType="{x:Type controls:NodeView}">
         <Setter Property="Width" Value="270" />
@@ -75,7 +76,8 @@
                                                             Visibility="{Binding OutputType, Converter={StaticResource NodeConnectorVisibilityConverter}}"/>
                                 </Grid>
                             </Border>
-                            <ItemsControl ItemsSource="{Binding PropertyEditors}"
+                            <ItemsControl x:Name="PART_PropertyContainer" 
+                                          ItemsSource="{Binding PropertyEditors}"
                                           Margin="0,6">
                                 <ItemsControl.ItemContainerStyle>
                                     <Style TargetType="ContentPresenter">
@@ -96,6 +98,7 @@
                                                                    Style="{StaticResource PropertyDisplayNameStyle}"/>
 
                                                         <ContentControl Grid.Column="2" 
+                                                                        IsEnabled="{Binding IsConnected, Converter={StaticResource InverseBoolConverter}}"
                                                                         ContentTemplateSelector="{StaticResource PropertyEditorTemplateSelector}"
                                                                         Content="{Binding}" />
                                                     </Grid>

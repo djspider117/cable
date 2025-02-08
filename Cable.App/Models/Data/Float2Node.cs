@@ -20,6 +20,5 @@ public partial class Float2Node : NodeDataBase
         _value = f;
     }
 
-
     public override object? GetOutput() => Value;
 }

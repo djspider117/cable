@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,6 +18,8 @@ namespace Cable.App.Views.Controls;
 
 public partial class DataConnector : UserControl
 {
+    public event EventHandler? ConnectionStarted;
+
     public DataConnector()
     {
         InitializeComponent();
@@ -30,6 +33,7 @@ public partial class DataConnector : UserControl
 
     protected override void OnMouseDown(MouseButtonEventArgs e)
     {
+        ConnectionStarted?.Invoke(this, e);
         e.Handled = true;
         base.OnMouseDown(e);
     }

@@ -1,11 +1,12 @@
 ﻿using Cable.App.Models.Data;
 using Cable.App.ViewModels.Data.PropertyEditors;
+using System.ComponentModel;
 using System.Numerics;
 
 namespace Cable.App.ViewModels.Data;
 
 [NodeData]
-public unsafe partial class Transform2DNode : NodeDataBase
+public partial class Transform2DNode : NodeDataBase
 {
     private Matrix3x2 _transform;
 

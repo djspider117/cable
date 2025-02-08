@@ -1,5 +1,6 @@
 ﻿using Cable.App.Models.Data;
 using Cable.App.ViewModels.Data.PropertyEditors;
+using System.ComponentModel;
 
 namespace Cable.App.ViewModels.Data;
 
@@ -13,6 +14,7 @@ public partial class NodeViewModel : ObservableObject
     [ObservableProperty]
     private double _y = 0d;
 
+    public NodeDataBase Data => _data;
     public string Title => _data.Title;
     public CableDataType InputType => _data.InputType;
     public CableDataType OutputType => _data.OutputType;
