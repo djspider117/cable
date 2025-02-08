@@ -36,12 +36,14 @@
             </ToggleButton>
         </StackPanel>
 
-        <Canvas Background="#55000000" Grid.Row="1">
+        <Canvas x:Name="pnlNodeContainer" Background="#55000000" Grid.Row="1"
+                ClipToBounds="True">
 
+        </Canvas>
 
+        <Canvas x:Name="pnlOverlayCanvas" Grid.Row="1">
             <local:NodeEditor x:Name="nodeEditor" Canvas.Left="1350" Canvas.Top="25"/>
             <local:Monitor x:Name="monitor" Canvas.Left="980" Canvas.Top="450"/>
-            
         </Canvas>
 
     </Grid>

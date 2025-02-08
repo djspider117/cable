@@ -5,6 +5,10 @@ VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cable.App", "Cable.App\Cable.App.csproj", "{9B4F8ADA-C4D7-4973-A32F-3518109D79B4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cable.SourceGenerators", "Cable.SourceGenerators\Cable.SourceGenerators.csproj", "{9BF0F275-C7F8-415F-A38A-2A1F15EA71B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cable.Core", "Cable.Core\Cable.Core.csproj", "{2E6D5579-937B-4A41-BE37-5146D7B7E413}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -15,6 +19,14 @@ Global
 		{9B4F8ADA-C4D7-4973-A32F-3518109D79B4}.Debug|x64.Build.0 = Debug|Any CPU
 		{9B4F8ADA-C4D7-4973-A32F-3518109D79B4}.Release|x64.ActiveCfg = Release|Any CPU
 		{9B4F8ADA-C4D7-4973-A32F-3518109D79B4}.Release|x64.Build.0 = Release|Any CPU
+		{9BF0F275-C7F8-415F-A38A-2A1F15EA71B5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9BF0F275-C7F8-415F-A38A-2A1F15EA71B5}.Debug|x64.Build.0 = Debug|Any CPU
+		{9BF0F275-C7F8-415F-A38A-2A1F15EA71B5}.Release|x64.ActiveCfg = Release|Any CPU
+		{9BF0F275-C7F8-415F-A38A-2A1F15EA71B5}.Release|x64.Build.0 = Release|Any CPU
+		{2E6D5579-937B-4A41-BE37-5146D7B7E413}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2E6D5579-937B-4A41-BE37-5146D7B7E413}.Debug|x64.Build.0 = Debug|Any CPU
+		{2E6D5579-937B-4A41-BE37-5146D7B7E413}.Release|x64.ActiveCfg = Release|Any CPU
+		{2E6D5579-937B-4A41-BE37-5146D7B7E413}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
