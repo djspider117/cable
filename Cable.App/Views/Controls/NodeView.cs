@@ -9,6 +9,7 @@ public class NodeView : Control
     public static readonly DependencyProperty ViewModelProperty =
         DependencyProperty.Register(nameof(ViewModel), typeof(NodeViewModel), typeof(NodeView), new PropertyMetadata(null));
 
+    private static int _zIndex = 0;
     private bool _isDragging;
     private Point _initialHit;
 
@@ -27,6 +28,8 @@ public class NodeView : Control
     {
         _isDragging = true;
         _initialHit = e.GetPosition(this);
+
+        Panel.SetZIndex(this, ++_zIndex);
        
         base.OnMouseDown(e);
     }
@@ -48,6 +51,7 @@ public class NodeView : Control
     protected override void OnMouseUp(MouseButtonEventArgs e)
     {
         _isDragging = false;
+
         base.OnMouseUp(e);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Cable.App.ViewModels.Data;
+﻿using Cable.App.Models.Data.Connections;
+using Cable.App.ViewModels.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,9 +17,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace Cable.App.Views.Controls;
-/// <summary>
-/// Interaction logic for GraphEditor.xaml
-/// </summary>
+
 public partial class GraphEditor : UserControl
 {
     public GraphEditor()
