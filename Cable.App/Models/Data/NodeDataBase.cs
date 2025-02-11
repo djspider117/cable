@@ -1,4 +1,5 @@
 ﻿using Cable.App.Models.Data.Connections;
+using Cable.App.Models.Data.Types;
 using Cable.App.ViewModels.Data;
 using Cable.App.ViewModels.Data.PropertyEditors;
 using System.ComponentModel;
@@ -37,4 +38,16 @@ public abstract class NodeDataBase : ObservableObject, INodeData
             propEditor.PushPropertyChanged();
         }
     }
+}
+
+public abstract class NodeData<T> : NodeDataBase where T : ICableDataType
+{
+    public NodeData(string title, CableDataType inType, CableDataType outType) 
+        : base(title, inType, outType)
+    {
+    }
+
+    public override object? GetOutput() => GetTypedOutput();
+    public abstract T? GetTypedOutput();
+
 }

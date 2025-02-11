@@ -1,31 +1,17 @@
 ﻿using Cable.App.Models.Data;
 using Cable.App.ViewModels.Data.PropertyEditors;
-using System.ComponentModel;
 using System.Numerics;
 
 namespace Cable.App.ViewModels.Data;
 
-[NodeData]
+[NodeData("Transform", CableDataType.Any, CableDataType.Any)]
+[Slot<Vector2, Float2Editor>("Translation")]
+[Slot<float, FloatEditor>("Rotation")]
+[Slot<Vector2, Float2Editor>("Scale")]
+[Slot<Vector2, Float2Editor>("Center")]
 public partial class Transform2DNode : NodeDataBase
 {
     private Matrix3x2 _transform;
-
-    [PropertyEditor<Float2Editor>]
-    private Vector2 _translation;
-
-    [PropertyEditor<FloatEditor>]
-    private float _rotation;
-
-    [PropertyEditor<Float2Editor>]
-    private Vector2 _scale = new(1, 1);
-
-    [PropertyEditor<Float2Editor>]
-    private Vector2 _center;
-
-    public Transform2DNode()
-        : base("Transform", CableDataType.Any, CableDataType.Float2)
-    {
-    }
 
     public override object? GetOutput()
     {
@@ -40,9 +26,7 @@ public partial class Transform2DNode : NodeDataBase
 
         // Transform the incoming data
         if (incoming is Vector2 v)
-        {
             return Vector2.Transform(v, _transform);
-        }
 
         return null;
     }

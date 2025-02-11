@@ -1,6 +1,6 @@
 ﻿using Cable.App.Models.Data;
+using Cable.App.Models.Data.Nodes;
 using Cable.App.ViewModels.Data.PropertyEditors;
-using System.ComponentModel;
 
 namespace Cable.App.ViewModels.Data;
 

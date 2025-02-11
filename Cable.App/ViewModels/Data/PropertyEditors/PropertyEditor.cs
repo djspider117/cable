@@ -36,5 +36,4 @@ public abstract partial class PropertyEditor<T>(INodeData parent, string name, F
 
     public abstract IConnection CreateConnectionAsDestination(INodeData source);
     public abstract IConnection CreateConnectionAsSource(INodeData destination);
-
 }

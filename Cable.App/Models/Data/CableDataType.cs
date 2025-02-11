@@ -6,5 +6,12 @@ public enum CableDataType
     Int,
     Float,
     Float2,
-    Any
+    Float3,
+    Float4,
+    Geometry2D,
+    Mesh2D,
+    Camera2D,
+    Material,
+    TextureRGBA,
+    Any,
 }

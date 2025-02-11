@@ -1,6 +1,6 @@
 ﻿using Cable.App.ViewModels.Data.PropertyEditors;
 
-namespace Cable.App.Models.Data;
+namespace Cable.App.Models.Data.Nodes;
 
 public class EmptyNode : NodeDataBase
 {
