@@ -5,8 +5,11 @@ namespace Cable.App.Views.TemplateSelectors;
 
 public class PropertyEditorTemplateSelector : DataTemplateSelector
 {
+    public DataTemplate? InputOnlyEditorTemplate { get; set; }
+
     public DataTemplate? FloatEditorTemplate { get; set; }
     public DataTemplate? Float2EditorTemplate { get; set; }
+    public DataTemplate? ColorEditorTemplate { get; set; }
 
     public override DataTemplate? SelectTemplate(object item, DependencyObject container)
     {
@@ -16,6 +19,9 @@ public class PropertyEditorTemplateSelector : DataTemplateSelector
         if (item is Float2Editor)
             return Float2EditorTemplate;
 
-        return base.SelectTemplate(item, container);
+        if (item is ColorEditor)
+            return ColorEditorTemplate;
+
+        return InputOnlyEditorTemplate;
     }
 }

@@ -6,7 +6,16 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:ts="clr-namespace:Cable.App.Views.TemplateSelectors" xmlns:ed="clr-namespace:Cable.App.ViewModels.Data.PropertyEditors" xmlns:converters="clr-namespace:Cable.App.Views.Converters">
 
+    <converters:NodeConnectorVisibilityConverter x:Key="NodeConnectorVisibilityConverter" />
+    <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+    <converters:Vector4ToBrushConverter x:Key="Vector4ToBrushConverter" />
+
     <ts:PropertyEditorTemplateSelector x:Key="PropertyEditorTemplateSelector">
+        <ts:PropertyEditorTemplateSelector.InputOnlyEditorTemplate>
+            <DataTemplate>
+                
+            </DataTemplate>
+        </ts:PropertyEditorTemplateSelector.InputOnlyEditorTemplate>
         <ts:PropertyEditorTemplateSelector.FloatEditorTemplate>
             <DataTemplate DataType="{x:Type ed:FloatEditor}">
                 <TextBox Text="{Binding Value, Mode=TwoWay}" />
@@ -26,14 +35,20 @@
                 </Grid>
             </DataTemplate>
         </ts:PropertyEditorTemplateSelector.Float2EditorTemplate>
+        <ts:PropertyEditorTemplateSelector.ColorEditorTemplate>
+            <DataTemplate DataType="{x:Type ed:ColorEditor}">
+                <Border Width="60" Height="28" 
+                        Background="{Binding Value, Converter={StaticResource Vector4ToBrushConverter}}"
+                        CornerRadius="4">
+                    <!--TODO-->
+                </Border>
+            </DataTemplate>
+        </ts:PropertyEditorTemplateSelector.ColorEditorTemplate>
     </ts:PropertyEditorTemplateSelector>
 
     <Style x:Key="PropertyDisplayNameStyle" TargetType="TextBlock">
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
-
-    <converters:NodeConnectorVisibilityConverter x:Key="NodeConnectorVisibilityConverter" />
-    <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
 
     <Style TargetType="{x:Type controls:NodeView}">
         <Setter Property="Width" Value="270" />

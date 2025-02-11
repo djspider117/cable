@@ -9,12 +9,15 @@ namespace Cable.App.Views.Controls;
 
 public class NodeConnectionView : Control
 {
-    private IConnection _connection;
+    private readonly INodeViewResolver? _nodeViewResolver;
+    private readonly ConnectionViewModel _connectionViewModel;
+
+    private IConnection? _connection;
     private NodeView _source;
     private NodeView? _destination;
 
     public NodeView Source { get => _source; set => _source = value; }
-    public IConnection Connection { get => _connection; set => _connection = value; }
+    public IConnection? Connection { get => _connection; set => _connection = value; }
 
     public NodeView? Destination
     {
@@ -31,12 +34,23 @@ public class NodeConnectionView : Control
         }
     }
 
+    public NodeConnectionView(ConnectionViewModel connVm, INodeViewResolver resolver)
+    {
+        _nodeViewResolver = resolver;
+        _connectionViewModel = connVm;
 
-    public NodeConnectionView(NodeView source, NodeView? dest, IConnection connection)
+        _source = _nodeViewResolver.GetViewFromViewModel(connVm.SourceNode) ?? throw new InvalidOperationException("Source node must not be null");
+        _destination = _nodeViewResolver.GetViewFromViewModel(connVm.TargetNode);
+        _connection = connVm.Connection;
+    }
+
+    public NodeConnectionView(NodeView source, NodeView? dest, IConnection? connection)
     {
         _source = source;
         Destination = dest;
         _connection = connection;
+
+        _connectionViewModel = new ConnectionViewModel(source.ViewModel, dest?.ViewModel, connection);
 
         Source.ViewModel.PropertyChanged += ViewModel_PropertyChanged;
         if (Destination != null)
@@ -80,15 +94,23 @@ public class NodeConnectionView : Control
         }
         else
         {
-            destOffset = Destination.GetDataConnectorForProperty(_connection.PropertyName)
-                ?.TransformToVisual(Destination)
-                .Transform(new()) ?? new Point();
+            if (_connection == null)
+            {
+                destOffset.X = Destination.ViewModel.X + (Destination.PART_HeaderInput!.ActualWidth / 2);
+                destOffset.Y = Destination.ViewModel.Y + (Destination.PART_HeaderInput!.ActualHeight / 2);
+            }
+            else
+            {
+                destOffset = Destination.GetDataConnectorForProperty(_connection.PropertyName)
+                    ?.TransformToVisual(Destination)
+                    .Transform(new()) ?? new Point();
 
-            destOffset.X += Destination.ViewModel.X;
-            destOffset.Y += Destination.ViewModel.Y;
+                destOffset.X += Destination.ViewModel.X;
+                destOffset.Y += Destination.ViewModel.Y;
 
-            internalOffsetX = Destination.PART_HeaderInput!.ActualWidth / 2;
-            internalOffsetY = Destination.PART_HeaderInput!.ActualHeight / 2;
+                internalOffsetX = Destination.PART_HeaderInput!.ActualWidth / 2;
+                internalOffsetY = Destination.PART_HeaderInput!.ActualHeight / 2;
+            }
         }
 
         var srcX = Source.ViewModel.X + srcOffset.Value.X + (Source.PART_HeaderOutput!.ActualWidth / 2);

@@ -12,7 +12,7 @@ public abstract class NodeDataBase : ObservableObject, INodeData
     public CableDataType InputType { get; }
     public CableDataType OutputType { get; }
 
-    public IDataOutput? IncomingData { get; }
+    public IDataOutput? IncomingData { get; set; }
 
     public NodeDataBase(string title, CableDataType inType, CableDataType outType)
     {

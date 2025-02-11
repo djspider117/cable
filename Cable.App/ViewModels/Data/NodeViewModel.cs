@@ -1,4 +1,5 @@
 ﻿using Cable.App.Models.Data;
+using Cable.App.Models.Data.Connections;
 using Cable.App.Models.Data.Nodes;
 using Cable.App.ViewModels.Data.PropertyEditors;
 
@@ -32,4 +33,17 @@ public partial class NodeViewModel : ObservableObject
         _data = data;
         PropertyEditors = data.GetPropertyEditors();
     }
+}
+
+
+public partial class ConnectionViewModel(NodeViewModel? sourceNode, NodeViewModel? targetNode, IConnection? connection) : ObservableObject
+{
+    [ObservableProperty]
+    private IConnection? _connection = connection;
+
+    [ObservableProperty]
+    private NodeViewModel? _sourceNode = sourceNode;
+
+    [ObservableProperty]
+    private NodeViewModel? _targetNode = targetNode;
 }
