@@ -1,4 +1,5 @@
 ﻿using Cable.App.ViewModels.Data.PropertyEditors;
+using Cable.Data;
 
 namespace Cable.App.Models.Data.Nodes;
 

@@ -23,7 +23,7 @@
                        Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                        TextAlignment="Center" VerticalAlignment="Center"/>
 
-            <Rectangle Fill="Black" Grid.Row="1" />
+            <Image x:Name="DxImage" Stretch="Fill" Grid.Row="1"/>
 
             <TextBlock Text="Output 1920 x 1080 - 8 Bit Unsigned RGBA (int)" Grid.Row="2"
                        VerticalAlignment="Center" TextAlignment="Center"/>

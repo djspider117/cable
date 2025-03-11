@@ -1,7 +1,8 @@
 ﻿using Cable.App.Models.Data.Connections;
-using Cable.App.Models.Data.Types;
 using Cable.App.ViewModels.Data;
 using Cable.App.ViewModels.Data.PropertyEditors;
+using Cable.Data;
+using Cable.Data.Types;
 using System.ComponentModel;
 
 namespace Cable.App.Models.Data;
@@ -37,6 +38,11 @@ public abstract class NodeDataBase : ObservableObject, INodeData
         {
             propEditor.PushPropertyChanged();
         }
+    }
+
+    public virtual RenderCommandList GetRenderCommands()
+    {
+        return new RenderCommandList([]);
     }
 }
 

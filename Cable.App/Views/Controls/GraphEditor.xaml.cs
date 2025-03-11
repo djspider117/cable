@@ -23,8 +23,18 @@ namespace Cable.App.Views.Controls;
 
 public partial class GraphEditor : UserControl, INodeViewResolver
 {
+    public static readonly DependencyProperty SelectedNodeViewProperty =
+        DependencyProperty.Register(nameof(SelectedNodeView), typeof(NodeView), typeof(GraphEditor), new PropertyMetadata(null));
+
+
     private readonly Dictionary<NodeViewModel, NodeView> _nodeMapping = [];
     private NodeConnectionView? _pendingConnection;
+
+    public NodeView? SelectedNodeView
+    {
+        get => (NodeView)GetValue(SelectedNodeViewProperty);
+        set => SetValue(SelectedNodeViewProperty, value);
+    }
 
     public GraphEditor()
     {
@@ -100,6 +110,8 @@ public partial class GraphEditor : UserControl, INodeViewResolver
         pnlConnectionsContainer.Children.Add(new NodeConnectionView(v4, v6, null));
         pnlConnectionsContainer.Children.Add(new NodeConnectionView(v5, v6, renderer.CameraConnection));
 
+        SelectedNodeView = v6;
+        monitor.NodeToPreview = v6;
     }
 
     private void MainWindow_MouseUp(object sender, MouseButtonEventArgs e)

@@ -2,6 +2,7 @@
 using Cable.App.Models.Data.Connections;
 using Cable.App.Models.Data.Nodes;
 using Cable.App.ViewModels.Data.PropertyEditors;
+using Cable.Data;
 
 namespace Cable.App.ViewModels.Data;
 

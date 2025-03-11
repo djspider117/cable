@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Cable.App": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

@@ -12,7 +12,6 @@ public partial class InputOnlyEditor(INodeData parent, string name) : Observable
 
     public void PushPropertyChanged()
     {
-        throw new NotImplementedException();
     }
 
     public IConnection CreateConnectionAsDestination(INodeData source)

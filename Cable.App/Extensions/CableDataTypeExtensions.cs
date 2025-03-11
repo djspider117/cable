@@ -1,4 +1,4 @@
-﻿using Cable.App.Models.Data;
+﻿using Cable.Data;
 using System.Numerics;
 
 namespace Cable.App.Extensions;

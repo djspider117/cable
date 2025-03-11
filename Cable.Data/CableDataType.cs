@@ -1,4 +1,4 @@
-﻿namespace Cable.App.Models.Data;
+﻿namespace Cable.Data;
 
 public enum CableDataType
 {
@@ -12,6 +12,6 @@ public enum CableDataType
     Mesh2D,
     Camera2D,
     Material,
-    TextureRGBA,
+    RenderCommandList,
     Any,
 }

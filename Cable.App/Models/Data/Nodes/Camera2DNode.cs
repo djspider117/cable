@@ -1,6 +1,7 @@
 ﻿using Cable.App.Models.Data;
-using Cable.App.Models.Data.Types;
 using Cable.App.ViewModels.Data.PropertyEditors;
+using Cable.Data;
+using Cable.Data.Types;
 using System.Numerics;
 
 namespace Cable.App.ViewModels.Data;

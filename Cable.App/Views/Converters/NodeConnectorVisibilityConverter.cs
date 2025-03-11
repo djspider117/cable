@@ -1,4 +1,4 @@
-﻿using Cable.App.Models.Data;
+﻿using Cable.Data;
 using System.Globalization;
 using System.Windows.Data;
 

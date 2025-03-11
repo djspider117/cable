@@ -1,5 +1,5 @@
-﻿using Cable.App.Models.Data.Types;
-using Cable.App.ViewModels.Data;
+﻿using Cable.App.ViewModels.Data;
+using Cable.Data.Types;
 using System.Numerics;
 
 namespace Cable.App.Models.Data.Connections;

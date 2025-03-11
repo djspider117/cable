@@ -4,7 +4,9 @@
     xmlns:local="clr-namespace:Cable.App"
     xmlns:controls="clr-namespace:Cable.App.Views.Controls" 
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    xmlns:ts="clr-namespace:Cable.App.Views.TemplateSelectors" xmlns:ed="clr-namespace:Cable.App.ViewModels.Data.PropertyEditors" xmlns:converters="clr-namespace:Cable.App.Views.Converters">
+    xmlns:ts="clr-namespace:Cable.App.Views.TemplateSelectors" 
+    xmlns:ed="clr-namespace:Cable.App.ViewModels.Data.PropertyEditors" 
+    xmlns:converters="clr-namespace:Cable.App.Views.Converters">
 
     <converters:NodeConnectorVisibilityConverter x:Key="NodeConnectorVisibilityConverter" />
     <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
@@ -13,7 +15,7 @@
     <ts:PropertyEditorTemplateSelector x:Key="PropertyEditorTemplateSelector">
         <ts:PropertyEditorTemplateSelector.InputOnlyEditorTemplate>
             <DataTemplate>
-                
+                <!--empty-->
             </DataTemplate>
         </ts:PropertyEditorTemplateSelector.InputOnlyEditorTemplate>
         <ts:PropertyEditorTemplateSelector.FloatEditorTemplate>

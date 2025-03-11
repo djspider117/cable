@@ -28,6 +28,8 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Cable.Core\Cable.Core.csproj" />
+	  <ProjectReference Include="..\Cable.Data\Cable.Data.csproj" />
+	  <ProjectReference Include="..\Cable.Renderer\Cable.Renderer.vcxproj" />
 	  <ProjectReference Include="..\Cable.SourceGenerators\Cable.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 
