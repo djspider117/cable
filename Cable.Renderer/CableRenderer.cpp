@@ -12,9 +12,15 @@ namespace Cable {
 		{
 			delete _impl;
 		}
-		void CableRenderer::Render(RenderCommandList^ commandList)
+
+		void CableRenderer::PushCommandList(RenderCommandList^ commandList)
 		{
-			_impl->Render(commandList);
+			_impl->PushCommandList(commandList);
+		}
+
+		void CableRenderer::Render()
+		{
+			_impl->Render();
 		}
 	}
 }

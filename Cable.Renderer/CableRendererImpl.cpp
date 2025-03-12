@@ -32,7 +32,7 @@ namespace Cable {
 			_width(width),
 			_height(height)
 		{
-			InitializeDX11(hwnd);
+			InitializeDirect2D(hwnd);
 		}
 		CableRendererImpl::~CableRendererImpl()
 		{
@@ -42,220 +42,133 @@ namespace Cable {
 			}
 		}
 
-		void CableRendererImpl::InitializeDX11(HWND hwnd)
+		void CableRendererImpl::InitializeDirect2D(HWND hwnd)
 		{
-			DXGI_SWAP_CHAIN_DESC swapDesc = {};
-			swapDesc.BufferCount = 1;
-			swapDesc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-			swapDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-			swapDesc.OutputWindow = hwnd;
-			swapDesc.SampleDesc.Count = 1;
-			swapDesc.Windowed = TRUE;
-			swapDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-
-			throw_if_failed(
-				D3D11CreateDeviceAndSwapChain(
-					nullptr, 
-					D3D_DRIVER_TYPE_HARDWARE, 
-					nullptr, 
-					0,
-					nullptr, 
-					0, 
-					D3D11_SDK_VERSION, 
-					&swapDesc,
-					&_swapChain, 
-					&_device, 
-					nullptr, 
-					&_deviceContext),
-				"Failed to create device and swapchain");
-
-			ID3D11Texture2D* backBuffer;
-			_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBuffer);
-			_device->CreateRenderTargetView(backBuffer, nullptr, &_renderTargetView);
-			backBuffer->Release();
-
-			InitializeShaders();
-		}
-		void CableRendererImpl::InitializeShaders()
-		{
-			// Compile the vertex shader
-			CComPtr<ID3DBlob> vsBlob;
-			HRESULT hr = D3DCompileFromFile(
-				L"VertexShader.hlsl", // Path to the vertex shader file
-				nullptr,              // No defines
-				nullptr,              // No includes
-				"main",               // Entry point
-				"vs_5_0",             // Shader model (Vertex Shader 5.0)
-				0,                    // Compile flags
-				0,                    // Effect flags
-				&vsBlob,              // Output blob
-				nullptr               // Error blob (optional)
+			// Create the Direct3D 11 device
+			D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0 };
+			HRESULT hr = D3D11CreateDevice(
+				nullptr,
+				D3D_DRIVER_TYPE_HARDWARE,
+				nullptr,
+				0,
+				featureLevels,
+				1,
+				D3D11_SDK_VERSION,
+				&_device,
+				nullptr,
+				&_deviceContext
 			);
+			throw_if_failed(hr, "Failed to create Direct3D 11 device");
 
-			if (FAILED(hr))
-			{
-				throw std::exception("Failed to compile vertex shader");
-			}
+			// Create a shared texture
+			D3D11_TEXTURE2D_DESC textureDesc = {};
+			textureDesc.Width = _width;
+			textureDesc.Height = _height;
+			textureDesc.MipLevels = 1;
+			textureDesc.ArraySize = 1;
+			textureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+			textureDesc.SampleDesc.Count = 1;
+			textureDesc.Usage = D3D11_USAGE_DEFAULT;
+			textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+			textureDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED;
 
-			// Create the vertex shader
-			hr = _device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &_vertexShader);
-			if (FAILED(hr))
-			{
-				throw std::exception("Failed to create vertex shader");
-			}
+			hr = _device->CreateTexture2D(&textureDesc, nullptr, &_sharedTexture);
+			throw_if_failed(hr, "Failed to create shared texture");
 
-			// Define the input layout
-			D3D11_INPUT_ELEMENT_DESC layout[] =
-			{
-				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-				{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-			};
+			// Create a shared handle
+			CComPtr<IDXGIResource> dxgiResource;
+			hr = _sharedTexture->QueryInterface(__uuidof(IDXGIResource), reinterpret_cast<void**>(&dxgiResource));
+			throw_if_failed(hr, "Failed to get DXGI resource");
 
-			// Create the input layout
-			hr = _device->CreateInputLayout(layout, 2, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &_inputLayout);
-			if (FAILED(hr))
-			{
-				throw std::exception("Failed to create input layout");
-			}
+			hr = dxgiResource->GetSharedHandle(&_sharedHandle);
+			throw_if_failed(hr, "Failed to create shared handle");
 
-			// Compile the pixel shader
-			CComPtr<ID3DBlob> psBlob;
-			hr = D3DCompileFromFile(
-				L"PixelShader.hlsl", // Path to the pixel shader file
-				nullptr,             // No defines
-				nullptr,             // No includes
-				"main",              // Entry point
-				"ps_5_0",            // Shader model (Pixel Shader 5.0)
-				0,                   // Compile flags
-				0,                   // Effect flags
-				&psBlob,             // Output blob
-				nullptr              // Error blob (optional)
-			);
+			// Create the Direct2D factory
+			hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &_d2dFactory);
+			throw_if_failed(hr, "Failed to create Direct2D factory");
 
-			if (FAILED(hr))
-			{
-				throw std::exception("Failed to compile pixel shader");
-			}
+			// Create a DXGI surface from the shared texture
+			CComPtr<IDXGISurface> dxgiSurface;
+			hr = _sharedTexture->QueryInterface(__uuidof(IDXGISurface), reinterpret_cast<void**>(&dxgiSurface));
+			throw_if_failed(hr, "Failed to get DXGI surface");
 
-			// Create the pixel shader
-			hr = _device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &_pixelShader);
-			if (FAILED(hr))
-			{
-				throw std::exception("Failed to create pixel shader");
-			}
-		}
-		void CableRendererImpl::InitializeConstantBuffer()
-		{
-			D3D11_BUFFER_DESC cbDesc = {};
-			cbDesc.ByteWidth = sizeof(XMMATRIX);
-			cbDesc.Usage = D3D11_USAGE_DEFAULT;
-			cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+			// Create the Direct2D render target
+			D2D1_RENDER_TARGET_PROPERTIES rtProps = D2D1::RenderTargetProperties();
+			hr = _d2dFactory->CreateDxgiSurfaceRenderTarget(dxgiSurface, rtProps, &_renderTarget);
+			throw_if_failed(hr, "Failed to create Direct2D render target");
 
-			HRESULT hr = _device->CreateBuffer(&cbDesc, nullptr, &_constantBuffer);
-			if (FAILED(hr))
-			{
-				throw std::exception("Failed to create constant buffer");
-			}
+			hr = dxgiResource->GetSharedHandle(&_sharedHandle);
+			throw_if_failed(hr, "Failed to create shared handle");
+			// Create a white brush
+			hr = _renderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &_whiteBrush);
+			throw_if_failed(hr, "Failed to create brush");
 		}
 
-		void CableRendererImpl::Render(RenderCommandList^ commandList)
+		void CableRendererImpl::PushCommandList(RenderCommandList^ commandList)
 		{
-			const float clearColor[] = { 0.0f, 0.2f, 0.0f, 1.0f };
-			_deviceContext->ClearRenderTargetView(_renderTargetView, clearColor);
-
-			// Set primitive topology (e.g., triangle list)
-			_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-			 for each (IRenderCommand ^ command in commandList->Commands)
-			 {
-			     if (command->GetType() == Mesh2DRenderCommand::typeid)
-			     {
-			         Mesh2DRenderCommand^ meshCommand = (Mesh2DRenderCommand^)command;
-					 RenderMesh(meshCommand->Mesh, meshCommand->Camera);
-			     }
-			 }
-
-			// Present or flush the context (if using a swap chain)
-			_swapChain->Present(1, 0);
-		}
-		void CableRendererImpl::RenderMesh(Mesh2D^ mesh, Camera2D^ camera)
-		{
-			// Extract geometry data
-			Geometry2D^ geometry = mesh->Geometry;
-			array<Vector2>^ vertices = geometry->Vertices;
-			array<int>^ indices = geometry->Indices;
-
-			// Create vertex and index buffers for this mesh
-			CComPtr<ID3D11Buffer> vertexBuffer;
-			CComPtr<ID3D11Buffer> indexBuffer;
-			CreateBuffers(vertices, indices, &vertexBuffer, &indexBuffer);
-
-			// Set the vertex and index buffers
-			UINT stride = sizeof(Vertex); // Size of one vertex
-			UINT offset = 0;
-			_deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer.p, &stride, &offset);
-			_deviceContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
-			// Apply the transform and camera (you'll need to implement this)
-			ApplyTransformAndCamera(mesh->Transform, camera);
-
-			// Draw the mesh
-			_deviceContext->DrawIndexed(indices->Length, 0, 0);
+			_renderQueue.push(nativePtr);
 		}
 
-		void CableRendererImpl::CreateBuffers(array<Vector2>^ vertices, array<int>^ indices, ID3D11Buffer** vertexBuffer, ID3D11Buffer** indexBuffer)
+		void CableRendererImpl::Render()
 		{
-			// Convert vertices to DirectX format
-			std::vector<Vertex> dxVertices;
-			for each (Vector2 vertex in vertices)
+			RenderCommandList* commandList = _renderQueue.front();;
+			if (commandList == nullptr)
+				return;
+
+			_renderQueue.pop();
+
+			// Begin drawing
+			_renderTarget->BeginDraw();
+			_renderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black)); // Clear to black
+
+			// Render each command in the command list
+			for each (IRenderCommand ^ command in commandList->Commands)
 			{
-				dxVertices.push_back({ XMFLOAT3(vertex.X, vertex.Y, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) }); // White color
+				if (command->GetType() == Mesh2DRenderCommand::typeid)
+				{
+					Mesh2DRenderCommand^ meshCommand = (Mesh2DRenderCommand^)command;
+
+					Mesh2D^ mesh = meshCommand->Mesh;
+
+					// Extract geometry data
+					Geometry2D^ geometry = mesh->Geometry;
+					array<Vector2>^ vertices = geometry->Vertices;
+					array<int>^ indices = geometry->Indices;
+
+					// Create a Direct2D path geometry
+					CComPtr<ID2D1PathGeometry> pathGeometry;
+					HRESULT hr = _d2dFactory->CreatePathGeometry(&pathGeometry);
+					throw_if_failed(hr, "Failed to create path geometry");
+
+					// Write geometry data to the path geometry
+					CComPtr<ID2D1GeometrySink> sink;
+					hr = pathGeometry->Open(&sink);
+					throw_if_failed(hr, "Failed to open geometry sink");
+
+					// Begin the figure
+					sink->BeginFigure(
+						D2D1::Point2F(vertices[indices[0]].X, vertices[indices[0]].Y),
+						D2D1_FIGURE_BEGIN_FILLED
+					);
+
+					// Add lines for each index
+					for (int i = 1; i < indices->Length; i++)
+					{
+						sink->AddLine(D2D1::Point2F(vertices[indices[i]].X, vertices[indices[i]].Y));
+					}
+
+					// End the figure
+					sink->EndFigure(D2D1_FIGURE_END_CLOSED);
+					sink->Close();
+
+					// Draw the geometry
+					_renderTarget->DrawGeometry(pathGeometry, _whiteBrush, 1.0f);
+				}
 			}
 
-			// Create the vertex buffer
-			D3D11_BUFFER_DESC vertexBufferDesc = {};
-			vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-			vertexBufferDesc.ByteWidth = sizeof(Vertex) * dxVertices.size();
-			vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-
-			D3D11_SUBRESOURCE_DATA vertexInitData = {};
-			vertexInitData.pSysMem = dxVertices.data();
-
-			HRESULT hr = _device->CreateBuffer(&vertexBufferDesc, &vertexInitData, vertexBuffer);
-			if (FAILED(hr))
-			{
-				throw std::exception("Failed to create vertex buffer");
-			}
-
-			// Create the index buffer
-			D3D11_BUFFER_DESC indexBufferDesc = {};
-			indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-			indexBufferDesc.ByteWidth = sizeof(int) * indices->Length;
-			indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-
-			D3D11_SUBRESOURCE_DATA indexInitData = {};
-			pin_ptr<int> pinnedIndices = &indices[0]; // Pin the managed array
-			indexInitData.pSysMem = pinnedIndices;    // Assign the pinned pointer
-
-			hr = _device->CreateBuffer(&indexBufferDesc, &indexInitData, indexBuffer);
-			if (FAILED(hr))
-			{
-				throw std::exception("Failed to create index buffer");
-			}
-		}
-
-		void CableRendererImpl::ApplyTransformAndCamera(Matrix3x2 transform, Camera2D^ camera)
-		{
-			// Convert the transform and camera to a DirectX-compatible matrix
-			// (You'll need to implement this based on your camera and transform logic)
-			XMMATRIX worldMatrix = XMMatrixIdentity(); // Replace with actual transform
-			XMMATRIX viewMatrix = XMMatrixIdentity();  // Replace with camera view
-			XMMATRIX projectionMatrix = XMMatrixOrthographicOffCenterLH(0, _width, _height, 0, 0, 1); // 2D projection
-
-			// Combine matrices and set them in the vertex shader
-			XMMATRIX wvpMatrix = worldMatrix * viewMatrix * projectionMatrix;
-			_deviceContext->UpdateSubresource(_constantBuffer, 0, nullptr, &wvpMatrix, 0, 0);
-			_deviceContext->VSSetConstantBuffers(0, 1, &_constantBuffer.p);
+			// End drawing
+			HRESULT hr = _renderTarget->EndDraw();
+			throw_if_failed(hr, "Failed to end drawing");
 		}
 	}
 }
