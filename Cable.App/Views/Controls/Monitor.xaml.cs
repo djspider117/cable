@@ -1,5 +1,5 @@
 ﻿using Cable.App.Models.Data;
-using Cable.Renderer;
+using Cable.Renderer.SharpDX;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,9 +26,9 @@ public partial class Monitor : UserControl
     public static readonly DependencyProperty NodeToPreviewProperty =
         DependencyProperty.Register(nameof(NodeToPreview), typeof(NodeView), typeof(Monitor), new PropertyMetadata(null, (s, e) => (s as Monitor)!.OnNodeToPreviewChanged(e)));
 
-    private CableRenderer? _nativeRenderer;
     private NodeDataBase? _nodeData;
-    private DX11Host _dxHost;
+    private CableRenderer _renderer;
+    private D3DImage _d3dImage;
 
     public NodeView? NodeToPreview
     {
@@ -38,30 +38,25 @@ public partial class Monitor : UserControl
 
     public Monitor()
     {
+        _renderer = new CableRenderer();
         InitializeComponent();
+        _d3dImage = new D3DImage();
+        ImageElement.Source = _d3dImage;
 
         Loaded += Monitor_Loaded;
     }
 
-    private async void Monitor_Loaded(object sender, RoutedEventArgs e)
+    private void Monitor_Loaded(object sender, RoutedEventArgs e)
     {
         Loaded -= Monitor_Loaded;
-        await Task.Delay(100);
 
-        _dxHost = new DX11Host((int)rect.ActualWidth, (int)rect.ActualHeight);
-        DxPresenter.Content = _dxHost;
-        await Task.Delay(100);
-        _nativeRenderer = new CableRenderer((uint)rect.ActualWidth, (uint)rect.ActualHeight, _dxHost.GetHandle());
+        _renderer.InitializeSharpDX((int)ActualWidth, (int)ActualHeight, new WindowInteropHelper(Application.Current.MainWindow).Handle, _d3dImage);
         CompositionTarget.Rendering += CompositionTarget_Rendering;
-
     }
 
     private void CompositionTarget_Rendering(object? sender, EventArgs e)
     {
-        if (_nodeData == null)
-            return;
-
-        _nativeRenderer?.Render(_nodeData.GetRenderCommands());
+        _renderer.Render(_nodeData!.GetRenderCommands());
     }
 
     private void OnNodeToPreviewChanged(DependencyPropertyChangedEventArgs e)

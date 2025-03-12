@@ -19,6 +19,7 @@
 		<PackageReference Include="WPF-UI" Version="3.0.4" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0 " />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2 " />
+		<PackageReference Include="SharpDX.Direct3D9" Version="4.2.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -29,7 +30,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\Cable.Core\Cable.Core.csproj" />
 	  <ProjectReference Include="..\Cable.Data\Cable.Data.csproj" />
-	  <ProjectReference Include="..\Cable.Renderer\Cable.Renderer.vcxproj" />
+	  <ProjectReference Include="..\Cable.Renderer.SharpDX\Cable.Renderer.SharpDX.csproj" />
 	  <ProjectReference Include="..\Cable.SourceGenerators\Cable.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 

@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <DirectXMath.h>
+#include <msclr/gcroot.h>
 
 using namespace DirectX;
 using namespace Cable::Data;
@@ -24,17 +25,6 @@ namespace Cable::Data::Types::Native
 	public struct ColorMaterial
 	{
 		XMFLOAT4 Color;
-
-		ColorMaterial()
-		{
-			Color = XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f);
-		}
-
-		ColorMaterial(Types::ColorMaterialData^ o)
-			: Color(XMFLOAT4(o->Color.X, o->Color.Y, o->Color.Z, o->Color.W))
-		{
-
-		}
 	};
 	public struct GradientMaterial
 	{
@@ -43,25 +33,6 @@ namespace Cable::Data::Types::Native
 		GradientMaterialType Type;
 		GradientRenderMode RenderMode;
 		short Steps;
-
-		GradientMaterial() :
-			Type(GradientMaterialType::Horizontal),
-			RenderMode(GradientRenderMode::Smooth),
-			Color1(XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f)),
-			Color2(XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f))
-		{
-
-		}
-
-		GradientMaterial(Types::GradientMaterialData^ o) :
-			Color1(XMFLOAT4(o->Color1.X, o->Color1.Y, o->Color1.Z, o->Color1.W)),
-			Color2(XMFLOAT4(o->Color2.X, o->Color2.Y, o->Color2.Z, o->Color2.W)),
-			Steps(o->Steps),
-			Type((GradientMaterialType)(int)o->Type),
-			RenderMode((GradientRenderMode)(int)o->RenderMode)
-		{
-		}
-
 	};
 
 	public enum class MaterialType
@@ -88,36 +59,12 @@ namespace Cable::Data::Types::Native
 	{
 		std::vector<int> Indicies;
 		std::vector<XMFLOAT2> Vertices;
-
-		Geometry2D(Types::Geometry2D^ original);
 	};
 	public struct Mesh2D
 	{
 		Geometry2D Geometry;
 		XMMATRIX Transform;
 		Material RenderMaterial;
-
-		Mesh2D(Types::Mesh2D^ mesh) :
-			Geometry(mesh->Geometry),
-			Transform()
-		{
-			Matrix3x2^ t = mesh->Transform;
-			Transform = XMMATRIX(t->M11, t->M12, 0, 0, t->M21, t->M22, 0, 0, 0, 0, 1, 0, t->M31, t->M32, 0, 1);
-
-			if (mesh->Material->GetType() == Types::ColorMaterialData::typeid)
-			{
-				Types::ColorMaterialData^ matData = (Types::ColorMaterialData^)mesh->Material;
-				RenderMaterial = Material(ColorMaterial(matData));
-				return;
-			}
-
-			if (mesh->Material->GetType() == Types::GradientMaterialData::typeid)
-			{
-				Types::GradientMaterialData^ matData = (Types::GradientMaterialData^)mesh->Material;
-				RenderMaterial = Material(GradientMaterial(matData));
-				return;
-			}
-		}
 	};
 
 	public enum class RenderCommandType
@@ -127,8 +74,6 @@ namespace Cable::Data::Types::Native
 	public struct Mesh2DRenderCommand
 	{
 		Mesh2D Mesh;
-
-		Mesh2DRenderCommand(Types::Mesh2DRenderCommand^ original) : Mesh(original->Mesh) {}
 	};
 
 	public struct RenderCommand
@@ -139,15 +84,82 @@ namespace Cable::Data::Types::Native
 		{
 			Mesh2DRenderCommand Mesh2DCommand;
 		};
-
-		RenderCommand(Types::IRenderCommand^ renderCommand)
-		{
-			if (renderCommand->GetType() == Types::Mesh2DRenderCommand::typeid)
-			{
-				Types::Mesh2DRenderCommand^ matData = (Types::Mesh2DRenderCommand^)renderCommand;
-				Mesh2DCommand = Mesh2DRenderCommand(matData);
-				return;
-			}
-		}
 	};
+	
+	ColorMaterial FromManagedType(Types::ColorMaterialData^ o)
+	{
+		return ColorMaterial{ XMFLOAT4(o->Color.X, o->Color.Y, o->Color.Z, o->Color.W) };
+	}
+	GradientMaterial FromManagedType(Types::GradientMaterialData^ o)
+	{
+		return GradientMaterial{
+			XMFLOAT4(o->Color1.X, o->Color1.Y, o->Color1.Z, o->Color1.W),
+			XMFLOAT4(o->Color2.X, o->Color2.Y, o->Color2.Z, o->Color2.W),
+			(GradientMaterialType)(int)o->Type,
+			(GradientRenderMode)(int)o->RenderMode,
+			o->Steps
+		};
+	}
+	
+	Geometry2D FromManagedType(Types::Geometry2D^ original)
+	{
+		Geometry2D rv;
+		for each(System::Numerics::Vector2 ^ vert in original->Vertices)
+		{
+			rv.Vertices.push_back(XMFLOAT2(vert->X, vert->Y));
+		}
+
+		pin_ptr<int> pin(&original->Indices[0]);
+		std::copy(
+			static_cast<int*>(pin),
+			static_cast<int*>(pin + original->Indices->Length),
+			rv.Indicies.begin()
+		);
+
+		return rv;
+	}
+	
+	Mesh2D FromManagedType(Types::Mesh2D^ mesh)
+	{
+		Mesh2D rv;
+		rv.Geometry = FromManagedType(mesh->Geometry);
+
+		Matrix3x2^ t = mesh->Transform;
+		rv.Transform = XMMATRIX(t->M11, t->M12, 0, 0, t->M21, t->M22, 0, 0, 0, 0, 1, 0, t->M31, t->M32, 0, 1);
+
+		if (mesh->Material->GetType() == Types::ColorMaterialData::typeid)
+		{
+			Types::ColorMaterialData^ matData = (Types::ColorMaterialData^)mesh->Material;
+			rv.RenderMaterial = Material(FromManagedType(matData));
+		}
+
+		if (mesh->Material->GetType() == Types::GradientMaterialData::typeid)
+		{
+			Types::GradientMaterialData^ matData = (Types::GradientMaterialData^)mesh->Material;
+			rv.RenderMaterial = Material(FromManagedType(matData));
+		}
+
+		return rv;
+	}
+	/*
+	Mesh2DRenderCommand FromManagedType(Types::Mesh2DRenderCommand^ original)
+	{
+		Mesh2DRenderCommand rv;
+		rv.Mesh = FromManagedType(original->Mesh);
+		return rv;
+	}*/
+
+	//RenderCommand FromManagedType(Types::IRenderCommand^ renderCommand)
+	//{
+	//	RenderCommand rv;
+
+	//	if (renderCommand->GetType() == Types::Mesh2DRenderCommand::typeid)
+	//	{
+	//		Types::Mesh2DRenderCommand^ matData = (Types::Mesh2DRenderCommand^)renderCommand;
+	//		rv.Mesh2DCommand = FromManagedType(matData);
+	//	}
+
+	//	return rv;
+	//}
+	
 }
