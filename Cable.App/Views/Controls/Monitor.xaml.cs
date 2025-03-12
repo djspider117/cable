@@ -3,6 +3,7 @@ using Cable.Renderer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -20,15 +21,14 @@ namespace Cable.App.Views.Controls;
 /// <summary>
 /// Interaction logic for Monitor.xaml
 /// </summary>
-public unsafe partial class Monitor : UserControl
+public partial class Monitor : UserControl
 {
     public static readonly DependencyProperty NodeToPreviewProperty =
         DependencyProperty.Register(nameof(NodeToPreview), typeof(NodeView), typeof(Monitor), new PropertyMetadata(null, (s, e) => (s as Monitor)!.OnNodeToPreviewChanged(e)));
 
     private CableRenderer? _nativeRenderer;
-    private D3DImage _d3dImage = new();
-    private void* _sharedHandle;
     private NodeDataBase? _nodeData;
+    private DX11Host _dxHost;
 
     public NodeView? NodeToPreview
     {
@@ -39,35 +39,29 @@ public unsafe partial class Monitor : UserControl
     public Monitor()
     {
         InitializeComponent();
-        DxImage.Source = _d3dImage;
 
         Loaded += Monitor_Loaded;
     }
 
-    private void Monitor_Loaded(object sender, RoutedEventArgs e)
+    private async void Monitor_Loaded(object sender, RoutedEventArgs e)
     {
         Loaded -= Monitor_Loaded;
-        _nativeRenderer = new CableRenderer((uint)ActualWidth, (uint)ActualHeight);
-        _sharedHandle = _nativeRenderer.GetSharedHandle();
+        await Task.Delay(100);
+
+        _dxHost = new DX11Host((int)rect.ActualWidth, (int)rect.ActualHeight);
+        DxPresenter.Content = _dxHost;
+        await Task.Delay(100);
+        _nativeRenderer = new CableRenderer((uint)rect.ActualWidth, (uint)rect.ActualHeight, _dxHost.GetHandle());
         CompositionTarget.Rendering += CompositionTarget_Rendering;
 
     }
 
     private void CompositionTarget_Rendering(object? sender, EventArgs e)
     {
-        if (_sharedHandle == null || _nodeData == null)
+        if (_nodeData == null)
             return;
 
         _nativeRenderer?.Render(_nodeData.GetRenderCommands());
-
-        // Lock the D3DImage
-        _d3dImage.Lock();
-
-        // Set the back buffer
-        _d3dImage.SetBackBuffer(D3DResourceType.IDirect3DSurface9, (nint)_sharedHandle);
-
-        // Unlock the D3DImage
-        _d3dImage.Unlock();
     }
 
     private void OnNodeToPreviewChanged(DependencyPropertyChangedEventArgs e)

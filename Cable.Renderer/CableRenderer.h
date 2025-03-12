@@ -15,6 +15,7 @@
 
 using namespace Cable::Data;
 using namespace Cable::Data::Types;
+using namespace System::Numerics;
 
 namespace Cable {
 	namespace Renderer {
@@ -22,49 +23,43 @@ namespace Cable {
 		class CableRendererImpl
 		{
 		public:
-			CableRendererImpl(UINT width, UINT height);
+			CableRendererImpl(UINT width, UINT height, HWND hwnd);
 			~CableRendererImpl();
 
 			void Render(RenderCommandList^ commandList);
 
-			void CreateSharedTexture();
-			HANDLE GetSharedHandle();
+			void RenderMesh(Mesh2D^ mesh, Camera2D^ camera);
+			void CreateBuffers(array<Vector2>^ vertices, array<int>^ indices, ID3D11Buffer** vertexBuffer, ID3D11Buffer** indexBuffer);
+
+			void ApplyTransformAndCamera(Matrix3x2 transform, Camera2D^ camera);
 
 		private:
 			UINT _width;
 			UINT _height;
-			CComPtr<ID3D12Device> _device;
-			CComPtr<ID3D12CommandQueue> _commandQueue;
-			CComPtr<ID3D12CommandAllocator> _commandAllocator;
-			CComPtr<ID3D12GraphicsCommandList> _commandList;
+			CComPtr<ID3D11Device> _device;
+			CComPtr<ID3D11DeviceContext> _deviceContext;
+			CComPtr<IDXGISwapChain> _swapChain;
+			CComPtr<ID3D11RenderTargetView> _renderTargetView;
+			CComPtr<ID3D11InputLayout> _inputLayout;  // Input layout for vertex data
+			CComPtr<ID3D11VertexShader> _vertexShader; // Vertex shader
+			CComPtr<ID3D11PixelShader> _pixelShader;   // Pixel shader
+			CComPtr<ID3D11Buffer> _constantBuffer;
 
-			CComPtr<ID3D12Resource> _sharedTexture;
-			CComPtr<IDXGIResource> _dxgiResource;
 			HANDLE _sharedHandle;
 
-			CComPtr<ID3D12DescriptorHeap> _rtvHeap;
-			CComPtr<ID3D12Resource> _renderTargets[2]; // Double buffering
-			CComPtr<ID3D12Fence> _fence;
-
-			HANDLE _fenceEvent;
-			UINT64 _fenceValue;
-			int _frameIndex;
-
-
-			void InitializeDX12();
-			void WaitForPreviousFrame();
+			void InitializeDX11(HWND hwnd);
+			void InitializeShaders();
+			void InitializeConstantBuffer();
 		};
 
 
 		public ref class CableRenderer
 		{
 		public:
-			CableRenderer(UINT width, UINT height);
+			CableRenderer(UINT width, UINT height, System::IntPtr hwnd);
 			~CableRenderer();
 
 			void Render(RenderCommandList^ commandList);
-			void CreateSharedTexture();
-			HANDLE GetSharedHandle();
 
 		private:
 			CableRendererImpl* _impl;

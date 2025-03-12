@@ -16,9 +16,7 @@ public partial class RasterizerNode : NodeData<RenderCommandList>
         if (mesh == null || mesh is not Mesh2D meshData)
             return new RenderCommandList();
 
-        return new RenderCommandList([
-            new Mesh2DRenderCommand(meshData, Camera, AA)
-            ]);
+        return new RenderCommandList([new Mesh2DRenderCommand(meshData, Camera, AA)]);
     }
 
     public override RenderCommandList GetRenderCommands()

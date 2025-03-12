@@ -3,9 +3,10 @@
 namespace Cable {
 	namespace Renderer {
 
-		CableRenderer::CableRenderer(UINT width, UINT height)
+		CableRenderer::CableRenderer(UINT width, UINT height, System::IntPtr hwnd)
 		{
-			_impl = new CableRendererImpl(width, height);
+			HWND nativeHwnd = static_cast<HWND>(hwnd.ToPointer());
+			_impl = new CableRendererImpl(width, height, nativeHwnd);
 		}
 		CableRenderer::~CableRenderer()
 		{
@@ -14,14 +15,6 @@ namespace Cable {
 		void CableRenderer::Render(RenderCommandList^ commandList)
 		{
 			_impl->Render(commandList);
-		}
-		void CableRenderer::CreateSharedTexture()
-		{
-			_impl->CreateSharedTexture();
-		}
-		HANDLE CableRenderer::GetSharedHandle()
-		{
-			return _impl->GetSharedHandle();
 		}
 	}
 }

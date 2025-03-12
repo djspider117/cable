@@ -76,12 +76,19 @@ public partial class GraphEditor : UserControl, INodeViewResolver
         var transformNode = new Transform2DNode();
         var gradientNode = new GradienteNode();
 
+        rectNode.WidthEditor.Value = 100;
+        rectNode.HeightEditor.Value = 50;
+
+        transformNode.ScaleEditor.ValueX = 1;
+        transformNode.ScaleEditor.ValueY = 1;
+
         var meshNode = new Mesh2DNode();
         meshNode.GeometryConnection = new Geometry2DConnection(rectNode, meshNode, nameof(Mesh2DNode.Geometry));
         meshNode.TransformConnection = new Transform2DConnection(transformNode, meshNode, nameof(Mesh2DNode.Transform));
         meshNode.MaterialConnection = new MaterialConnection(gradientNode, meshNode, nameof(Mesh2DNode.Material));
 
         var cameraNode = new Camera2DNode();
+        cameraNode.ZoomEditor.Value = 1;
 
         var renderer = new RasterizerNode { IncomingData = meshNode };
         renderer.CameraConnection = new Camera2DConnection(cameraNode, renderer, nameof(RasterizerNode.Camera));

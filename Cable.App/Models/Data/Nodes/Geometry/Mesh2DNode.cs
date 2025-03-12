@@ -14,6 +14,6 @@ public partial class Mesh2DNode : NodeData<Mesh2D>
 {
     public override Mesh2D GetTypedOutput()
     {
-        return new Mesh2D(_geometry, _transform, _material);
+        return new Mesh2D(Geometry, Transform, Material);
     }
 }
