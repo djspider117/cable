@@ -19,12 +19,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<!--<PackageReference Include="Microsoft.Toolkit.UI.XamlHost" Version="6.1.2" />-->
-		<PackageReference Include="Microsoft.Toolkit.Wpf.UI.XamlHost" Version="6.1.2" />
 		<PackageReference Include="WPF-UI" Version="3.0.4" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0 " />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2 " />
-		<PackageReference Include="SharpDX.Direct3D9" Version="4.2.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -33,7 +30,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Cable.App.UWP\Cable.App.UWP.csproj" />
 	  <ProjectReference Include="..\Cable.Core\Cable.Core.csproj" />
 	  <ProjectReference Include="..\Cable.Data\Cable.Data.csproj" />
 	  <ProjectReference Include="..\Cable.SourceGenerators\Cable.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
