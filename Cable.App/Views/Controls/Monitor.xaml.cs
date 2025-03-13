@@ -1,4 +1,6 @@
 ﻿using Cable.App.Models.Data;
+using Cable.Renderer;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +28,7 @@ public partial class Monitor : UserControl
         DependencyProperty.Register(nameof(NodeToPreview), typeof(NodeView), typeof(Monitor), new PropertyMetadata(null, (s, e) => (s as Monitor)!.OnNodeToPreviewChanged(e)));
 
     private NodeDataBase? _nodeData;
+    private SkiaRenderer _renderer;
 
     public NodeView? NodeToPreview
     {
@@ -37,6 +40,7 @@ public partial class Monitor : UserControl
     {
         InitializeComponent();
 
+        _renderer = new SkiaRenderer();
         Loaded += Monitor_Loaded;
     }
 
@@ -49,6 +53,7 @@ public partial class Monitor : UserControl
 
     private void CompositionTarget_Rendering(object? sender, EventArgs e)
     {
+       SkiaElement.InvalidateVisual();
     }
 
     private void OnNodeToPreviewChanged(DependencyPropertyChangedEventArgs e)
@@ -56,7 +61,11 @@ public partial class Monitor : UserControl
         if (e.NewValue is NodeView nv)
         {
             _nodeData = nv.ViewModel.Data;
-            InvalidateVisual();
         }
+    }
+
+    private void SkiaElement_PaintSurface(object sender, SkiaSharp.Views.Desktop.SKPaintSurfaceEventArgs e)
+    {
+        _renderer.Render(e, _nodeData!.GetRenderCommands());
     }
 }

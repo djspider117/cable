@@ -11,7 +11,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<AssetTargetFallback>uap10.0.19041</AssetTargetFallback>
-		<Platforms>AnyCPU;x64</Platforms>
+		<Platforms>x64</Platforms>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -22,6 +22,8 @@
 		<PackageReference Include="WPF-UI" Version="3.0.4" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0 " />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2 " />
+		<PackageReference Include="SkiaSharp" Version="3.116.1 " />
+		<PackageReference Include="SkiaSharp.Views.WPF" Version="3.116.1 " />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -32,6 +34,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\Cable.Core\Cable.Core.csproj" />
 	  <ProjectReference Include="..\Cable.Data\Cable.Data.csproj" />
+	  <ProjectReference Include="..\Cable.Renderer\Cable.Renderer.csproj" />
 	  <ProjectReference Include="..\Cable.SourceGenerators\Cable.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 

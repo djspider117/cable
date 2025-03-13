@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0-windows</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Platforms>x64</Platforms>
+		<UseWPF>true</UseWPF>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SkiaSharp" Version="3.116.1 " />
+		<PackageReference Include="SkiaSharp.Views.WPF" Version="3.116.1 " />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Cable.Data\Cable.Data.csproj" />
+	</ItemGroup>
+</Project>
