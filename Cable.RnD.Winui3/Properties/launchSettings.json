@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Cable.RnD.Winui3 (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Cable.RnD.Winui3 (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
