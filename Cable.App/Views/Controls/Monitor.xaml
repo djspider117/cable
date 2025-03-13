@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Cable.App.Views.Controls"
+             xmlns:xamlhost="clr-namespace:Microsoft.Toolkit.Wpf.UI.XamlHost;assembly=Microsoft.Toolkit.Wpf.UI.XamlHost"
              mc:Ignorable="d" 
              Background="#202020"
              
@@ -24,7 +25,8 @@
                        TextAlignment="Center" VerticalAlignment="Center"/>
 
             <Rectangle x:Name="rect" Fill="Black" Grid.Row="1"/>
-            <Image x:Name="ImageElement" Grid.Row="1"/>
+
+            <xamlhost:WindowsXamlHost InitialTypeName="Cable.App.UWP.RendererPage" Grid.Row="1"/>
 
             <TextBlock Text="Output 1920 x 1080 - 8 Bit Unsigned RGBA (int)" Grid.Row="2"
                        VerticalAlignment="Center" TextAlignment="Center"/>

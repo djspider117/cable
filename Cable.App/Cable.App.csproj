@@ -2,13 +2,16 @@
 
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net9.0-windows</TargetFramework>
+		<TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<ApplicationIcon>wpfui-icon.ico</ApplicationIcon>
 		<UseWPF>true</UseWPF>
 		<Nullable>enable</Nullable>
+		<StartupObject>Cable.App.Program</StartupObject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<AssetTargetFallback>uap10.0.19041</AssetTargetFallback>
+		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -16,6 +19,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<!--<PackageReference Include="Microsoft.Toolkit.UI.XamlHost" Version="6.1.2" />-->
+		<PackageReference Include="Microsoft.Toolkit.Wpf.UI.XamlHost" Version="6.1.2" />
 		<PackageReference Include="WPF-UI" Version="3.0.4" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0 " />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2 " />
@@ -28,9 +33,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Cable.App.UWP\Cable.App.UWP.csproj" />
 	  <ProjectReference Include="..\Cable.Core\Cable.Core.csproj" />
 	  <ProjectReference Include="..\Cable.Data\Cable.Data.csproj" />
-	  <ProjectReference Include="..\Cable.Renderer.SharpDX\Cable.Renderer.SharpDX.csproj" />
 	  <ProjectReference Include="..\Cable.SourceGenerators\Cable.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 
