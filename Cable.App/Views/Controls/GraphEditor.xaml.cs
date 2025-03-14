@@ -1,8 +1,10 @@
 ﻿using Cable.App.Extensions;
+using Cable.App.Models.Data;
 using Cable.App.Models.Data.Connections;
 using Cable.App.Models.Messages;
 using Cable.App.ViewModels.Data;
 using Cable.App.ViewModels.Data.PropertyEditors;
+using Cable.Core;
 using Cable.Data.Types;
 using CommunityToolkit.Mvvm.Messaging;
 using System;
@@ -45,6 +47,14 @@ public partial class GraphEditor : UserControl, INodeViewResolver
 
         WeakReferenceMessenger.Default.Register<StartNodeConnectionMessage>(this, OnStartNodeConnectionMessage);
         Application.Current.MainWindow.MouseUp += MainWindow_MouseUp;
+
+        Loaded += GraphEditor_Loaded;
+    }
+
+    private async void GraphEditor_Loaded(object sender, RoutedEventArgs e)
+    {
+        await Task.Delay(100);
+        PerformAutoLayout();
     }
 
     private void BuildDemoGraph()
@@ -185,9 +195,69 @@ public partial class GraphEditor : UserControl, INodeViewResolver
         pnlConnectionsContainer.Children.Add(_pendingConnection);
     }
 
-
     public NodeView? GetViewFromViewModel(NodeViewModel? vm)
     {
         throw new NotImplementedException();
+    }
+
+    public void PerformAutoLayout()
+    {
+        Graph<NodeView> graph = GetNodeViewGraph();
+
+        if (graph.Root == null)
+            return;
+
+        var layout = new GraphLayout<NodeView>();
+        layout.Layout(graph.Root, 0, ActualWidth - 650);
+    }
+
+    public Graph<NodeView> GetNodeViewGraph()
+    {
+        var nodes = new List<GraphItem<NodeView>>();
+
+        foreach (NodeConnectionView conn in pnlConnectionsContainer.Children)
+        {
+            var existingSrc = nodes.FirstOrDefault(x => x.Data == conn.Source);
+            var existingDst = nodes.FirstOrDefault(x => x.Data == conn.Destination);
+
+            if (existingSrc != null && existingDst != null)
+            {
+                existingSrc.Children.Add(existingDst);
+                existingDst.Parents.Add(existingSrc);
+            }
+
+            if (existingSrc == null && existingDst != null)
+            {
+                var srcNode = new GraphItem<NodeView> { Data = conn.Source };
+                srcNode.Children.Add(existingDst);
+                existingDst.Parents.Add(srcNode);
+                nodes.Add(srcNode);
+            }
+
+            if (existingSrc != null && existingDst == null && conn.Destination != null)
+            {
+                var dstNode = new GraphItem<NodeView> { Data = conn.Destination };
+                existingSrc.Children.Add(dstNode);
+                dstNode.Parents.Add(existingSrc);
+
+                nodes.Add(dstNode);
+            }
+
+            if (existingSrc == null && existingDst == null && conn.Destination != null)
+            {
+                var srcNode = new GraphItem<NodeView> { Data = conn.Source };
+                var dstNode = new GraphItem<NodeView> { Data = conn.Destination };
+
+                srcNode.Children.Add(dstNode);
+                dstNode.Parents.Add(srcNode);
+
+                nodes.Add(srcNode);
+                nodes.Add(dstNode);
+            }
+        }
+
+        // the node with the least outputs is going to be our root
+        var root = nodes.OrderBy(x => x.Children.Count).FirstOrDefault();
+        return new Graph<NodeView> { Root = root };
     }
 }

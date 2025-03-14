@@ -2,6 +2,7 @@
 using Cable.App.Models.Messages;
 using Cable.App.ViewModels.Data;
 using Cable.App.ViewModels.Data.PropertyEditors;
+using Cable.Core;
 using CommunityToolkit.Mvvm.Messaging;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -9,7 +10,7 @@ using Wpf.Ui.Controls;
 
 namespace Cable.App.Views.Controls;
 
-public class NodeView : Control
+public class NodeView : Control, ILayoutable
 {
     public static readonly DependencyProperty ViewModelProperty =
         DependencyProperty.Register(nameof(ViewModel), typeof(NodeViewModel), typeof(NodeView), new PropertyMetadata(null));
@@ -27,6 +28,19 @@ public class NodeView : Control
         get => (NodeViewModel)GetValue(ViewModelProperty);
         set => SetValue(ViewModelProperty, value);
     }
+
+    public double X
+    {
+        get => ViewModel.X;
+        set => ViewModel.X = value;
+    }
+
+    public double Y
+    {
+        get => ViewModel.Y;
+        set => ViewModel.Y = value;
+    }
+
 
     static NodeView()
     {

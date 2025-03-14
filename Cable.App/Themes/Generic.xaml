@@ -61,7 +61,7 @@
                             <Grid Margin="0,0,0,4">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="110" />
+                                    <ColumnDefinition Width="75" />
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="11" />
                                 </Grid.ColumnDefinitions>
@@ -90,7 +90,7 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="11" />
                                     <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="110" />
+                                    <ColumnDefinition Width="75" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
@@ -113,7 +113,7 @@
     </ts:PropertyEditorContainerSelector>
 
     <Style TargetType="{x:Type controls:NodeView}">
-        <Setter Property="Width" Value="270" />
+        <Setter Property="Width" Value="220" />
         <Setter Property="Background" Value="#FF323232" />
         <Setter Property="Canvas.Left" Value="{Binding ViewModel.X, RelativeSource={RelativeSource Mode=Self}}" />
         <Setter Property="Canvas.Top" Value="{Binding ViewModel.Y, RelativeSource={RelativeSource Mode=Self}}" />
