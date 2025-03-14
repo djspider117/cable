@@ -17,6 +17,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RnD", "RnD", "{EB8D6A43-B8D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cable.Renderer.Development", "Cable.Renderer.Development\Cable.Renderer.Development.csproj", "{5B0D6B93-94C6-46FC-A571-DB2713FBF972}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{6FA1A7A2-DE12-41ED-ABA7-AE7F3C1F7FB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cable.Renderer.Tests", "Cable.Renderer.Tests\Cable.Renderer.Tests.csproj", "{59785413-A484-4520-8D7B-AF4836FE14D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -47,11 +51,16 @@ Global
 		{5B0D6B93-94C6-46FC-A571-DB2713FBF972}.Debug|x64.Build.0 = Debug|Any CPU
 		{5B0D6B93-94C6-46FC-A571-DB2713FBF972}.Release|x64.ActiveCfg = Release|Any CPU
 		{5B0D6B93-94C6-46FC-A571-DB2713FBF972}.Release|x64.Build.0 = Release|Any CPU
+		{59785413-A484-4520-8D7B-AF4836FE14D0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{59785413-A484-4520-8D7B-AF4836FE14D0}.Debug|x64.Build.0 = Debug|Any CPU
+		{59785413-A484-4520-8D7B-AF4836FE14D0}.Release|x64.ActiveCfg = Release|Any CPU
+		{59785413-A484-4520-8D7B-AF4836FE14D0}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5B0D6B93-94C6-46FC-A571-DB2713FBF972} = {EB8D6A43-B8D0-4F23-80C0-2A60B55C0DD4}
+		{59785413-A484-4520-8D7B-AF4836FE14D0} = {6FA1A7A2-DE12-41ED-ABA7-AE7F3C1F7FB6}
 	EndGlobalSection
 EndGlobal

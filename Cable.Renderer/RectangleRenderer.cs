@@ -6,20 +6,20 @@ namespace Cable.Renderer;
 
 public class RectangleRenderer
 {
-    public static void Render(SKPaintSurfaceEventArgs e, RectangleShape shape, IMaterial? material, Transform transform)
+    public static void Render(SKCanvas canvas, RectangleShape shape, IMaterial? material, Transform transform)
     {
         using var paint = SKPaintProvider.CreatePaint(material, shape.Width, shape.Height);
 
         var skRect = new SKRect(0, 0, shape.Width, shape.Height);
-        e.Surface.Canvas.DrawRect(skRect, paint);
+        canvas.DrawRect(skRect, paint);
     }
 
-    public static void RenderRounded(SKPaintSurfaceEventArgs e, RoundedRectangleShape shape, IMaterial? material, Transform transform)
+    public static void RenderRounded(SKCanvas canvas, RoundedRectangleShape shape, IMaterial? material, Transform transform)
     {
         using var paint = SKPaintProvider.CreatePaint(material, shape.Width, shape.Height);
 
         var skRect = new SKRect(0, 0, shape.Width, shape.Height);
         var roundedRect = new SKRoundRect(skRect, shape.Radius);
-        e.Surface.Canvas.DrawRoundRect(roundedRect, paint);
+        canvas.DrawRoundRect(roundedRect, paint);
     }
 }

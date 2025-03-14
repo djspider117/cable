@@ -1,11 +1,11 @@
 ﻿using Cable.Data.Types;
-using SkiaSharp.Views.Desktop;
+using SkiaSharp;
 
 namespace Cable.Renderer;
 
 public class LineRenderer
 {
-    public static void Render(SKPaintSurfaceEventArgs e, LineShape shape, IMaterial? material, Transform transform)
+    public static void Render(SKCanvas canvas, LineShape shape, IMaterial? material, Transform transform)
     {
         var sz = shape.End - shape.Start;
 
@@ -13,6 +13,6 @@ public class LineRenderer
         paint.IsStroke = true;
         paint.StrokeWidth = shape.Thickness;
 
-        e.Surface.Canvas.DrawLine(shape.Start.ToSKPoint(), shape.End.ToSKPoint(), paint);
+        canvas.DrawLine(shape.Start.ToSKPoint(), shape.End.ToSKPoint(), paint);
     }
 }
