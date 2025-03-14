@@ -7,12 +7,6 @@ namespace Cable.Renderer.Tests;
 [TestClass]
 public sealed class SKRendererTests
 {
-    [ClassInitialize]
-    public static void ClassInit(TestContext context)
-    {
-        // This method is called once for the test class, before any tests of the class are run.
-    }
-
     [TestMethod]
     public void StaticSceneTest_ShouldMatchReference()
     {
@@ -36,6 +30,6 @@ public sealed class SKRendererTests
 
         var calcDiff = Compare.CalcDiff("actual.png", @"Data\RendererReference.png");
 
-        Assert.AreEqual(calcDiff.AbsoluteError, 0);
+        Assert.AreEqual(0, calcDiff.AbsoluteError);
     }
 }
