@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
 		<TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Platforms>x64</Platforms>
+		<ImplicitUsings>enable</ImplicitUsings>
 		<UseWPF>true</UseWPF>
 	</PropertyGroup>
 
@@ -14,6 +14,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Cable.Data\Cable.Data.csproj" />
+	  <ProjectReference Include="..\Cable.Data\Cable.Data.csproj" />
+	  <ProjectReference Include="..\Cable.Renderer\Cable.Renderer.csproj" />
 	</ItemGroup>
 </Project>

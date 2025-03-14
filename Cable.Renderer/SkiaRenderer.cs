@@ -1,14 +1,40 @@
 ﻿using Cable.Data.Types;
 using SkiaSharp;
 using SkiaSharp.Views.Desktop;
+using System.Collections.Concurrent;
+using System.Numerics;
 
 namespace Cable.Renderer;
 
 public class SkiaRenderer
 {
+    public event EventHandler<Vector2?>? DesiredSizeChanged;
+
     private readonly RendererProvider rendererProvider = new();
     private float _aa;
     private Camera2D _camera;
+    private ConcurrentQueue<RasterizerData> _renderQueue = new();
+
+    public Vector2? DesiredSize { get; private set; }
+
+    public void SetSize(Vector2 desiredSize)
+    {
+        DesiredSize = desiredSize;
+        DesiredSizeChanged?.Invoke(this, desiredSize);
+    }
+
+    public void PushFrame(RasterizerData rasterizerData)
+    {
+        _renderQueue.Enqueue(rasterizerData);
+    }
+
+    public void Render(SKPaintSurfaceEventArgs e)
+    {
+        if (!_renderQueue.TryDequeue(out var frameData))
+            return;
+
+        Render(e, frameData);
+    }
 
     public void Render(SKPaintSurfaceEventArgs e, RasterizerData renderData)
     {

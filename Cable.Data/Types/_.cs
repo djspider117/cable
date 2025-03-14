@@ -14,7 +14,7 @@ public readonly record struct RenderableElement(IShape? Shape, IMaterial? Materi
 
 public class RenderableCollection : List<RenderableElement>, ICableDataType;
 
-public readonly record struct Transform(Vector2 Translate, float Rotation, Vector2 Scale, Vector2 origin) : ICableDataType;
+public readonly record struct Transform(Vector2 Translate, float Rotation, Vector2 Scale, Vector2 OriginOffset) : ICableDataType;
 
 public readonly record struct RectangleShape(float Width, float Height) : IShape;
 
