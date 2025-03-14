@@ -8,6 +8,10 @@
     xmlns:ed="clr-namespace:Cable.App.ViewModels.Data.PropertyEditors" 
     xmlns:converters="clr-namespace:Cable.App.Views.Converters">
 
+    <Style x:Key="PropertyDisplayNameStyle" TargetType="TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    
     <converters:NodeConnectorVisibilityConverter x:Key="NodeConnectorVisibilityConverter" />
     <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
     <converters:Vector4ToBrushConverter x:Key="Vector4ToBrushConverter" />
@@ -48,9 +52,65 @@
         </ts:PropertyEditorTemplateSelector.ColorEditorTemplate>
     </ts:PropertyEditorTemplateSelector>
 
-    <Style x:Key="PropertyDisplayNameStyle" TargetType="TextBlock">
-        <Setter Property="VerticalAlignment" Value="Center" />
-    </Style>
+    <ts:PropertyEditorContainerSelector x:Key="PropertyEditorContainerSelector">
+        <ts:PropertyEditorContainerSelector.InputPropertyEditorStyle>
+            <Style TargetType="ContentPresenter">
+                <Setter Property="ContentTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <Grid Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="110" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="11" />
+                                </Grid.ColumnDefinitions>
+
+                                <controls:DataConnector Grid.Column="0" />
+
+                                <TextBlock Grid.Column="1" Text="{Binding DisplayName}"
+                                                                   Style="{StaticResource PropertyDisplayNameStyle}"/>
+
+                                <ContentControl Grid.Column="2" 
+                                                                        IsEnabled="{Binding IsConnected, Converter={StaticResource InverseBoolConverter}}"
+                                                                        ContentTemplateSelector="{StaticResource PropertyEditorTemplateSelector}"
+                                                                        Content="{Binding}" />
+                            </Grid>
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ts:PropertyEditorContainerSelector.InputPropertyEditorStyle>
+        <ts:PropertyEditorContainerSelector.OutputPropertyEditorStyle>
+            <Style TargetType="ContentPresenter">
+                <Setter Property="ContentTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <Grid Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="11" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="110" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+
+                                <TextBlock Grid.Column="2" Text="{Binding DisplayName}"
+                                                                   Style="{StaticResource PropertyDisplayNameStyle}"/>
+
+                                <ContentControl Grid.Column="1" 
+                                                                        IsEnabled="{Binding IsConnected, Converter={StaticResource InverseBoolConverter}}"
+                                                                        ContentTemplateSelector="{StaticResource PropertyEditorTemplateSelector}"
+                                                                        Content="{Binding}" />
+                                <controls:DataConnector Grid.Column="3" />
+                            </Grid>
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+        </ts:PropertyEditorContainerSelector.OutputPropertyEditorStyle>
+    </ts:PropertyEditorContainerSelector>
 
     <Style TargetType="{x:Type controls:NodeView}">
         <Setter Property="Width" Value="270" />
@@ -95,35 +155,8 @@
                             </Border>
                             <ItemsControl x:Name="PART_PropertyContainer" 
                                           ItemsSource="{Binding PropertyEditors}"
+                                          ItemContainerStyleSelector="{StaticResource PropertyEditorContainerSelector}"
                                           Margin="0,6">
-                                <ItemsControl.ItemContainerStyle>
-                                    <Style TargetType="ContentPresenter">
-                                        <Setter Property="ContentTemplate">
-                                            <Setter.Value>
-                                                <DataTemplate>
-                                                    <Grid Margin="0,0,0,4">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="Auto" />
-                                                            <ColumnDefinition Width="110" />
-                                                            <ColumnDefinition Width="*" />
-                                                            <ColumnDefinition Width="11" />
-                                                        </Grid.ColumnDefinitions>
-
-                                                        <controls:DataConnector Grid.Column="0" />
-                                                        
-                                                        <TextBlock Grid.Column="1" Text="{Binding DisplayName}"
-                                                                   Style="{StaticResource PropertyDisplayNameStyle}"/>
-
-                                                        <ContentControl Grid.Column="2" 
-                                                                        IsEnabled="{Binding IsConnected, Converter={StaticResource InverseBoolConverter}}"
-                                                                        ContentTemplateSelector="{StaticResource PropertyEditorTemplateSelector}"
-                                                                        Content="{Binding}" />
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </ItemsControl.ItemContainerStyle>
                             </ItemsControl>
                         </StackPanel>
                     </Border>

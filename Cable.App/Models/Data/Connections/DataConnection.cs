@@ -14,11 +14,15 @@ public abstract partial class DataConnection<T> : ObservableObject, IConnection<
     [ObservableProperty]
     private string? _propertyName;
 
-    public DataConnection(INodeData source, INodeData target, string? propertyName = null)
+    [ObservableProperty]
+    private string? _sourcePropertyName;
+
+    public DataConnection(INodeData source, INodeData target, string? targetPropName = null, string? sourcePropName = null)
     {
         _sourceNode = source;
         _targetNode = target;
-        _propertyName = propertyName;
+        _propertyName = targetPropName;
+        _sourcePropertyName = sourcePropName;
 
         _sourceNode.PropertyChanged += Node_PropertyChanged;
     }
@@ -33,11 +37,13 @@ public abstract partial class DataConnection<T> : ObservableObject, IConnection<
         if (SourceNode == null)
             return default;
 
-        var output = SourceNode.GetOutput();
-        if (output == null)
-            return default;
+        var output = SourcePropertyName != null ? SourceNode.GetPropertyOutput(SourcePropertyName) : SourceNode.GetOutput();
+        return output == null ? default : ConvertValue(output);
+    }
 
-        return (T)output;
+    public virtual T ConvertValue(object value)
+    {
+        return (T)value;
     }
 }
 

@@ -49,7 +49,10 @@ public partial class Monitor : UserControl
 
     private void CompositionTarget_Rendering(object? sender, EventArgs e)
     {
-        _renderer.PushFrame(_nodeData!.GetRenderCommands());
+        if (_nodeData == null)
+            return;
+
+        _renderer.PushFrame(_nodeData.GetRenderCommands());
     }
 
     private void OnNodeToPreviewChanged(DependencyPropertyChangedEventArgs e)

@@ -3,6 +3,7 @@ using Cable.App.Models.Data.Connections;
 using Cable.App.Models.Messages;
 using Cable.App.ViewModels.Data;
 using Cable.App.ViewModels.Data.PropertyEditors;
+using Cable.Data.Types;
 using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Collections.Generic;
@@ -72,11 +73,17 @@ public partial class GraphEditor : UserControl, INodeViewResolver
 
     private void BuildDemoGraph2()
     {
+        var scene = App.GetService<CableSceneViewModel>()!;
+
+        var timelineNode = new TimelineNode(scene.Timeline);
+
         var rectNode = new RectangleNode();
         var transformNode = new Transform2DNode();
         var gradientNode = new GradienteNode();
 
-        rectNode.WidthEditor.Value = 100;
+        rectNode.WidthConnection = new UIntToFloatConnection(timelineNode, rectNode, "Width", "FrameIndex");
+
+        //rectNode.WidthEditor.Value = 100;
         rectNode.HeightEditor.Value = 50;
 
         transformNode.ScaleEditor.ValueX = 1;
@@ -99,6 +106,7 @@ public partial class GraphEditor : UserControl, INodeViewResolver
 
         // views
 
+        var v0 = new NodeView() { ViewModel = new NodeViewModel(timelineNode) };
         var v1 = new NodeView() { ViewModel = new NodeViewModel(rectNode) };
         var v2 = new NodeView() { ViewModel = new NodeViewModel(transformNode) };
         var v3 = new NodeView() { ViewModel = new NodeViewModel(gradientNode) };
@@ -106,6 +114,7 @@ public partial class GraphEditor : UserControl, INodeViewResolver
         var v5 = new NodeView() { ViewModel = new NodeViewModel(cameraNode) };
         var v6 = new NodeView() { ViewModel = new NodeViewModel(renderer) };
 
+        pnlNodeContainer.Children.Add(v0);
         pnlNodeContainer.Children.Add(v1);
         pnlNodeContainer.Children.Add(v2);
         pnlNodeContainer.Children.Add(v3);
@@ -114,15 +123,36 @@ public partial class GraphEditor : UserControl, INodeViewResolver
         pnlNodeContainer.Children.Add(v6);
 
 
+        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v0, v1, rectNode.WidthConnection));
         pnlConnectionsContainer.Children.Add(new NodeConnectionView(v1, v4, meshNode.ShapeConnection));
         pnlConnectionsContainer.Children.Add(new NodeConnectionView(v2, v4, meshNode.TransformConnection));
         pnlConnectionsContainer.Children.Add(new NodeConnectionView(v3, v4, meshNode.MaterialConnection));
 
         pnlConnectionsContainer.Children.Add(new NodeConnectionView(v4, v6, null));
         pnlConnectionsContainer.Children.Add(new NodeConnectionView(v5, v6, renderer.CameraConnection));
+        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v5, v6, renderer.CameraConnection));
 
         SelectedNodeView = v6;
         monitor.NodeToPreview = v6;
+    }
+
+    private void BuildDemoGraph3()
+    {
+        var scene = App.GetService<CableSceneViewModel>()!;
+
+        var timelineNode = new TimelineNode(scene.Timeline);
+        var floatNode = new FloatNode(0);
+
+        var c1 = new UIntToFloatConnection(timelineNode, floatNode, "Value", "FrameIndex");
+
+
+        var v1 = new NodeView() { ViewModel = new NodeViewModel(timelineNode) };
+        var v2 = new NodeView() { ViewModel = new NodeViewModel(floatNode) };
+
+        pnlNodeContainer.Children.Add(v1);
+        pnlNodeContainer.Children.Add(v2);
+
+        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v1, v2, c1));
     }
 
     private void MainWindow_MouseUp(object sender, MouseButtonEventArgs e)

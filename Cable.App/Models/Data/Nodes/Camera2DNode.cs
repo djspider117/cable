@@ -11,6 +11,12 @@ namespace Cable.App.ViewModels.Data;
 [Slot<Transform>("Transform")]
 public partial class Camera2DNode : NodeData<Camera2D>
 {
+    public override void Initialize()
+    {
+        base.Initialize();
+        _transform = Transform.Identity;
+    }
+
     public override Camera2D GetTypedOutput()
     {
         return new Camera2D(_zoom, Transform);

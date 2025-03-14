@@ -1,4 +1,5 @@
-﻿using Cable.App.ViewModels.Data.PropertyEditors;
+﻿using Cable.App.ViewModels.Data;
+using Cable.App.ViewModels.Data.PropertyEditors;
 using System.Windows.Controls;
 
 namespace Cable.App.Views.TemplateSelectors;
@@ -10,7 +11,6 @@ public class PropertyEditorTemplateSelector : DataTemplateSelector
     public DataTemplate? FloatEditorTemplate { get; set; }
     public DataTemplate? Float2EditorTemplate { get; set; }
     public DataTemplate? ColorEditorTemplate { get; set; }
-
     public override DataTemplate? SelectTemplate(object item, DependencyObject container)
     {
         if (item is FloatEditor)
@@ -23,5 +23,19 @@ public class PropertyEditorTemplateSelector : DataTemplateSelector
             return ColorEditorTemplate;
 
         return InputOnlyEditorTemplate;
+    }
+}
+
+public class PropertyEditorContainerSelector : StyleSelector
+{
+    public Style? InputPropertyEditorStyle { get; set; }
+    public Style? OutputPropertyEditorStyle { get; set; }
+
+    public override Style? SelectStyle(object item, DependencyObject container)
+    {
+        if (item is IOutputPropertyEditor)
+            return OutputPropertyEditorStyle;
+
+        return InputPropertyEditorStyle;
     }
 }

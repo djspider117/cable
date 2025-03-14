@@ -37,3 +37,24 @@ public abstract partial class PropertyEditor<T>(INodeData parent, string name, F
     public abstract IConnection CreateConnectionAsDestination(INodeData source);
     public abstract IConnection CreateConnectionAsSource(INodeData destination);
 }
+
+public abstract partial class OutputPropertyEditor<T> : ObservableObject, IOutputPropertyEditor
+{
+    public INodeData Parent { get; set; }
+    public string DisplayName { get; }
+
+    public OutputPropertyEditor(INodeData sourceNode, string name, Func<T> getter)
+    {
+        Parent = sourceNode;
+        DisplayName = name;
+    }
+
+    public virtual void PushPropertyChanged()
+    {
+        
+    }
+
+    public abstract IConnection CreateConnectionAsDestination(INodeData source);
+
+    public abstract IConnection CreateConnectionAsSource(INodeData destination);
+}

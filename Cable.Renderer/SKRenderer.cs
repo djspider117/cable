@@ -74,7 +74,7 @@ public class SKRenderer
         canvas.Clear(SKColors.Black);
         var updatedTransform = new Transform(_camera.Transform.Translate, _camera.Transform.Rotation, _camera.Transform.Scale * _camera.Zoom, _camera.Transform.OriginOffset);
         ApplyTransform(canvas, updatedTransform, (_currentFrameInfo?.Width ?? 0) / 2, (_currentFrameInfo?.Height ?? 0) / 2);
-        
+
         foreach (var element in renderData.Elements)
         {
             Render(canvas, element);

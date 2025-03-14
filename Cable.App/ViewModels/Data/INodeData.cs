@@ -19,4 +19,5 @@ public interface INodeData : IDataOutput, INotifyPropertyChanged
 public interface IDataOutput
 {
     object? GetOutput();
+    object? GetPropertyOutput(string propertyName);
 }

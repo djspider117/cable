@@ -85,8 +85,12 @@ public class NodeConnectionView : Control
             return;
 
         Point destOffset;
+        Point localSrcOffset;
         double internalOffsetX = 0;
         double internalOffsetY = 0;
+
+        double srcInternalOffsetX = 0;
+        double srcInternalOffsetY = 0;
         if (Destination == null)
         {
             var pos = Application.Current.MainWindow.PointToScreen(Mouse.GetPosition(Application.Current.MainWindow));
@@ -101,20 +105,38 @@ public class NodeConnectionView : Control
             }
             else
             {
-                destOffset = Destination.GetDataConnectorForProperty(_connection.PropertyName)
-                    ?.TransformToVisual(Destination)
-                    .Transform(new()) ?? new Point();
+                if (_connection.PropertyName != null)
+                {
+                    destOffset = Destination.GetDataConnectorForProperty(_connection.PropertyName)?
+                        .TransformToVisual(Destination)
+                        .Transform(new()) ?? new Point();
 
-                destOffset.X += Destination.ViewModel.X;
-                destOffset.Y += Destination.ViewModel.Y;
+                    destOffset.X += Destination.ViewModel.X;
+                    destOffset.Y += Destination.ViewModel.Y;
 
-                internalOffsetX = Destination.PART_HeaderInput!.ActualWidth / 2;
-                internalOffsetY = Destination.PART_HeaderInput!.ActualHeight / 2;
+                    internalOffsetX = Destination.PART_HeaderInput!.ActualWidth / 2;
+                    internalOffsetY = Destination.PART_HeaderInput!.ActualHeight / 2;
+                }
+
+                if (_connection.SourcePropertyName != null)
+                {
+                    localSrcOffset = Source.GetDataConnectorForProperty(_connection.SourcePropertyName)?
+                        .TransformToVisual(Source)
+                        .Transform(new()) ?? new Point();
+
+                    localSrcOffset.X += Source.ViewModel.X;
+                    localSrcOffset.Y += Source.ViewModel.Y;
+                }
             }
         }
 
-        var srcX = Source.ViewModel.X + srcOffset.Value.X + (Source.PART_HeaderOutput!.ActualWidth / 2);
-        var srcY = Source.ViewModel.Y + srcOffset.Value.Y + (Source.PART_HeaderOutput!.ActualHeight / 2);
+        var srcX = _connection?.SourcePropertyName != null
+            ? localSrcOffset.X + (Source.PART_HeaderOutput!.ActualWidth / 2)
+            : Source.ViewModel.X + srcOffset.Value.X + (Source.PART_HeaderOutput!.ActualWidth / 2);
+        var srcY = _connection?.SourcePropertyName != null
+            ? localSrcOffset.Y + (Source.PART_HeaderOutput!.ActualHeight / 2)
+            : Source.ViewModel.Y + srcOffset.Value.Y + (Source.PART_HeaderOutput!.ActualHeight / 2);
+
         var destX = destOffset.X + internalOffsetX;
         var destY = destOffset.Y + internalOffsetY;
 

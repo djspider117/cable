@@ -14,3 +14,9 @@ public partial class Transform2DConnection(INodeData source, INodeData target, s
 public partial class MaterialConnection(INodeData source, INodeData target, string? propName = null) : DataConnection<IMaterial>(source, target, propName) { }
 public partial class Camera2DConnection(INodeData source, INodeData target, string? propName = null) : DataConnection<Camera2D>(source, target, propName) { }
 public partial class Mesh2DConnection(INodeData source, INodeData target, string? propName = null) : DataConnection<Mesh2D>(source, target, propName) { }
+
+public partial class UIntToFloatConnection(INodeData source, INodeData target, string? propName = null, string? sourceName = null)
+    : DataConnection<float>(source, target, propName, sourceName)
+{
+    public override float ConvertValue(object value) => Convert.ToSingle(value);
+}

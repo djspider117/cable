@@ -21,11 +21,14 @@ public abstract class NodeDataBase : ObservableObject, INodeData
         Title = title;
         InputType = inType;
         OutputType = outType;
+        Initialize();
     }
 
     public abstract IEnumerable<IPropertyEditor> GetPropertyEditors();
 
     public abstract object? GetOutput();
+
+    public virtual void Initialize() { }
 
     public void SetConnection(IConnection conn)
     {
@@ -44,6 +47,11 @@ public abstract class NodeDataBase : ObservableObject, INodeData
     public virtual RasterizerData GetRenderCommands()
     {
         return new RasterizerData(new Camera2D(1, Transform.Identity), 0, []);
+    }
+
+    public virtual object? GetPropertyOutput(string propertyName)
+    {
+        return null;
     }
 }
 

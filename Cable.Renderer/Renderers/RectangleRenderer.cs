@@ -9,7 +9,7 @@ public class RectangleRenderer
     public static void Render(SKCanvas canvas, RectangleShape shape, IMaterial? material, Transform transform)
     {
         using var paint = SKPaintProvider.CreatePaint(material, shape.Width, shape.Height);
-
+        
         var skRect = new SKRect(0, 0, shape.Width, shape.Height);
         canvas.DrawRect(skRect, paint);
     }

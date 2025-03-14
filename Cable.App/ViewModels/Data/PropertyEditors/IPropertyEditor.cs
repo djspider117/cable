@@ -12,3 +12,7 @@ public interface IPropertyEditor
     IConnection CreateConnectionAsDestination(INodeData source);
     IConnection CreateConnectionAsSource(INodeData destination);
 }
+
+public interface IOutputPropertyEditor : IPropertyEditor
+{
+}

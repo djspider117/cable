@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Windows.Threading;
 using Cable.App.Services;
+using Cable.App.ViewModels.Data;
 using Cable.App.ViewModels.Windows;
 using Cable.App.Views.Windows;
 using Microsoft.Extensions.Configuration;
@@ -28,6 +29,8 @@ namespace Cable.App
 
                 // TaskBar manipulation
                 services.AddSingleton<ITaskBarService, TaskBarService>();
+
+                services.AddSingleton<CableSceneViewModel>();
 
                 // Main window with navigation
                 services.AddSingleton<MainWindow>();
