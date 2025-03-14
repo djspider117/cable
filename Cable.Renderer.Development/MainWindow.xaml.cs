@@ -22,6 +22,7 @@ public partial class MainWindow : Window
 {
     private readonly SKRenderer _renderer;
     private double _time;
+    private int _index;
 
     public MainWindow()
     {
@@ -32,8 +33,7 @@ public partial class MainWindow : Window
 
         SkiaElement.Renderer = _renderer;
 
-        //_renderer.PushFrame(BuildTransformTest());
-        //_renderer.PushFrame(StaticSceneBuilder.BuildScene());
+
         //BuildReferenceImage();
 
         CompositionTarget.Rendering += CompositionTarget_Rendering;
@@ -57,7 +57,14 @@ public partial class MainWindow : Window
     private void CompositionTarget_Rendering(object? sender, EventArgs e)
     {
         _time++;
-        _renderer.PushFrame(BuildDemoSceneRenderTree());
+        if (_index == 0)
+            _renderer.PushFrame(BuildDemoSceneRenderTree());
+
+        if (_index == 1)
+            _renderer.PushFrame(BuildTransformTest());
+
+        if (_index == 2)
+            _renderer.PushFrame(StaticSceneBuilder.BuildScene());
     }
 
     public RasterizerData BuildTransformTest()
@@ -114,4 +121,8 @@ public partial class MainWindow : Window
         return new RasterizerData(camera, 1, renderCol);
     }
 
+    private void btnSceneCycle_Click(object sender, RoutedEventArgs e)
+    {
+        _index = (_index + 1) % 3;
+    }
 }

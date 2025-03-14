@@ -11,5 +11,9 @@
     <Grid>
         <controls:AnimatedRenderViewer x:Name="SkiaElement"
                                IgnorePixelScaling="True"/>
+
+        <Button x:Name="btnSceneCycle" Content="Cycle" Click="btnSceneCycle_Click"
+                HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10"
+                Width="100" Height="40"/>
     </Grid>
 </Window>
