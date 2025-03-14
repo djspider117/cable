@@ -1,4 +1,5 @@
-﻿using SkiaSharp;
+﻿using Cable.Data.Types;
+using SkiaSharp;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
@@ -21,5 +22,20 @@ public static class SKConversions
             Persp1 = 0,
             Persp2 = 1
         };
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static SKPaintStyle ToSKPaintStyle(this MaterialOptions opts)
+    {
+        if (opts.IsFill)
+            return SKPaintStyle.Fill;
+
+        if (opts.IsFill && opts.ApplyBorder)
+            return SKPaintStyle.StrokeAndFill;
+
+        if (!opts.IsFill || opts.ApplyBorder)
+            return SKPaintStyle.Stroke;
+
+        return SKPaintStyle.Fill;
     }
 }

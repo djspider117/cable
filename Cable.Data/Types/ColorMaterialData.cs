@@ -2,4 +2,4 @@
 
 namespace Cable.Data.Types;
 
-public readonly record struct ColorMaterialData(Vector4 Color) : IMaterial;
+public readonly record struct ColorMaterialData(Vector4 Color, MaterialOptions MaterialOptions = default) : IMaterial;

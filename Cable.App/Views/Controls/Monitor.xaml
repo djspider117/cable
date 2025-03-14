@@ -26,7 +26,6 @@
 
             <Rectangle x:Name="rect" Fill="Black" Grid.Row="1"/>
             <controls:AnimatedRenderViewer x:Name="SkiaElement"
-                                           PaintSurface="SkiaElement_PaintSurface"
                                            IgnorePixelScaling="True" 
                                            Grid.Row="1"/>
 

@@ -26,7 +26,9 @@ public class SKPaintProvider
                    (byte)(colorData.Color.Z * 255),
                    (byte)(colorData.Color.W * 255)),
                 IsAntialias = true,
-                Style = SKPaintStyle.Fill
+                Style = colorData.MaterialOptions.ToSKPaintStyle(),
+                IsStroke = colorData.MaterialOptions.ApplyBorder,
+                StrokeWidth = colorData.MaterialOptions.BorderThickness
             };
         }
 
@@ -35,7 +37,9 @@ public class SKPaintProvider
             var paint = new SKPaint
             {
                 IsAntialias = true,
-                Style = SKPaintStyle.Fill
+                Style = gradientData.MaterialOptions.ToSKPaintStyle(),
+                IsStroke = gradientData.MaterialOptions.ApplyBorder,
+                StrokeWidth = gradientData.MaterialOptions.BorderThickness
             };
 
             var color1 = new SKColor(

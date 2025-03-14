@@ -19,7 +19,6 @@ public class RectangleRenderer
 
         var skRect = new SKRect(0, 0, shape.Width, shape.Height);
         canvas.DrawRect(skRect, paint);
-
         canvas.Restore();
     }
 }

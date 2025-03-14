@@ -41,19 +41,15 @@ public partial class Monitor : UserControl
         InitializeComponent();
 
         _renderer = new SkiaRenderer();
-        Loaded += Monitor_Loaded;
-    }
+        _renderer.SetSize(new System.Numerics.Vector2(1280, 720));
 
-    private void Monitor_Loaded(object sender, RoutedEventArgs e)
-    {
-        Loaded -= Monitor_Loaded;
-
+        SkiaElement.Renderer = _renderer;
         CompositionTarget.Rendering += CompositionTarget_Rendering;
     }
 
     private void CompositionTarget_Rendering(object? sender, EventArgs e)
     {
-       SkiaElement.InvalidateVisual();
+        _renderer.PushFrame(_nodeData!.GetRenderCommands());
     }
 
     private void OnNodeToPreviewChanged(DependencyPropertyChangedEventArgs e)
@@ -62,10 +58,5 @@ public partial class Monitor : UserControl
         {
             _nodeData = nv.ViewModel.Data;
         }
-    }
-
-    private void SkiaElement_PaintSurface(object sender, SkiaSharp.Views.Desktop.SKPaintSurfaceEventArgs e)
-    {
-        _renderer.Render(e, _nodeData!.GetRenderCommands());
     }
 }

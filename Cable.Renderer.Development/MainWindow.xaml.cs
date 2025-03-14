@@ -35,7 +35,6 @@ public partial class MainWindow : Window
     {
         _time++;
         _renderer.PushFrame(BuildDemoSceneRenderTree());
-        SkiaElement.InvalidateVisual();
     }
 
     public RasterizerData BuildTransformTest()
@@ -82,7 +81,7 @@ public partial class MainWindow : Window
         renderCol.Add(new RenderableElement(rect2, mat2, t2));
         renderCol.Add(new RenderableElement(rect1, mat1, t1));
 
-        var camera = new Camera2D(1, Matrix3x2.Identity);
+        var camera = new Camera2D(usin + 0.5f, Matrix3x2.Identity);
         return new RasterizerData(camera, 1, renderCol);
     }
 }

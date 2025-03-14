@@ -33,6 +33,16 @@ public class AnimatedRenderViewer : FrameworkElement
 
     public SkiaRenderer? Renderer { get; set; }
 
+    public AnimatedRenderViewer()
+    {
+        CompositionTarget.Rendering += CompositionTarget_Rendering;
+    }
+
+    private void CompositionTarget_Rendering(object? sender, EventArgs e)
+    {
+        InvalidateVisual();
+    }
+
     protected override void OnRender(DrawingContext drawingContext)
     {
         base.OnRender(drawingContext);
