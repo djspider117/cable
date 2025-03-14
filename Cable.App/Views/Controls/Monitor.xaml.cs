@@ -28,7 +28,7 @@ public partial class Monitor : UserControl
         DependencyProperty.Register(nameof(NodeToPreview), typeof(NodeView), typeof(Monitor), new PropertyMetadata(null, (s, e) => (s as Monitor)!.OnNodeToPreviewChanged(e)));
 
     private NodeDataBase? _nodeData;
-    private SkiaRenderer _renderer;
+    private SKRenderer _renderer;
 
     public NodeView? NodeToPreview
     {
@@ -40,7 +40,7 @@ public partial class Monitor : UserControl
     {
         InitializeComponent();
 
-        _renderer = new SkiaRenderer();
+        _renderer = new SKRenderer();
         _renderer.SetSize(new System.Numerics.Vector2(1280, 720));
 
         SkiaElement.Renderer = _renderer;

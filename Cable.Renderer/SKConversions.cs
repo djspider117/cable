@@ -38,4 +38,6 @@ public static class SKConversions
 
         return SKPaintStyle.Fill;
     }
+
+    public static SKPoint ToSKPoint(this Vector2 point) => new(point.X, point.Y);
 }

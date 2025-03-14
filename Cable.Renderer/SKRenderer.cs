@@ -6,7 +6,7 @@ using System.Numerics;
 
 namespace Cable.Renderer;
 
-public class SkiaRenderer
+public class SKRenderer
 {
     public event EventHandler<Vector2?>? DesiredSizeChanged;
 
@@ -68,7 +68,16 @@ public class SkiaRenderer
 
     private void Render(SKPaintSurfaceEventArgs e, IShape shape, IMaterial? material, Transform transform)
     {
+        var canvas = e.Surface.Canvas;
+
+        canvas.Save();
+        canvas.Translate(transform.Translate.X, transform.Translate.Y);
+        canvas.RotateDegrees(transform.Rotation);
+        canvas.Scale(transform.Scale.X, transform.Scale.Y);
+
         var renderingFunction = rendererProvider.GetRenderFunction(shape);
         renderingFunction(e, shape, material, transform);
+
+        canvas.Restore();
     }
 }

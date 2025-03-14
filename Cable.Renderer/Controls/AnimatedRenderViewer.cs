@@ -31,7 +31,7 @@ public class AnimatedRenderViewer : FrameworkElement
         }
     }
 
-    public SkiaRenderer? Renderer { get; set; }
+    public SKRenderer? Renderer { get; set; }
 
     public AnimatedRenderViewer()
     {

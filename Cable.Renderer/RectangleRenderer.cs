@@ -8,17 +8,18 @@ public class RectangleRenderer
 {
     public static void Render(SKPaintSurfaceEventArgs e, RectangleShape shape, IMaterial? material, Transform transform)
     {
-        var canvas = e.Surface.Canvas;
-
         using var paint = SKPaintProvider.CreatePaint(material, shape.Width, shape.Height);
 
-        canvas.Save();
-        canvas.Translate(transform.Translate.X, transform.Translate.Y);
-        canvas.RotateDegrees(transform.Rotation);
-        canvas.Scale(transform.Scale.X, transform.Scale.Y);
+        var skRect = new SKRect(0, 0, shape.Width, shape.Height);
+        e.Surface.Canvas.DrawRect(skRect, paint);
+    }
+
+    public static void RenderRounded(SKPaintSurfaceEventArgs e, RoundedRectangleShape shape, IMaterial? material, Transform transform)
+    {
+        using var paint = SKPaintProvider.CreatePaint(material, shape.Width, shape.Height);
 
         var skRect = new SKRect(0, 0, shape.Width, shape.Height);
-        canvas.DrawRect(skRect, paint);
-        canvas.Restore();
+        var roundedRect = new SKRoundRect(skRect, shape.Radius);
+        e.Surface.Canvas.DrawRoundRect(roundedRect, paint);
     }
 }
