@@ -33,11 +33,10 @@ public partial class MainWindow : Window
         SkiaElement.Renderer = _renderer;
 
         //_renderer.PushFrame(BuildTransformTest());
-        //_renderer.PushFrame(BuildDemoSceneRenderTree());
-        _renderer.PushFrame(StaticSceneBuilder.BuildScene());
-        BuildReferenceImage();
+        //_renderer.PushFrame(StaticSceneBuilder.BuildScene());
+        //BuildReferenceImage();
 
-        //CompositionTarget.Rendering += CompositionTarget_Rendering;
+        CompositionTarget.Rendering += CompositionTarget_Rendering;
     }
 
     private void BuildReferenceImage()
@@ -58,15 +57,22 @@ public partial class MainWindow : Window
     private void CompositionTarget_Rendering(object? sender, EventArgs e)
     {
         _time++;
+        _renderer.PushFrame(BuildDemoSceneRenderTree());
     }
 
     public RasterizerData BuildTransformTest()
     {
+        var sin = MathF.Sin((float)(_time / 200));
+        var usin = sin;
+        if (usin < 0)
+            usin = Math.Abs(sin);
+
+
         var renderCol = new RenderableCollection();
         var identity = new Transform(Vector2.Zero, 0, Vector2.One, Vector2.Zero);
 
         var rect1 = new RectangleShape(200, 200);
-        var rect2 = new RectangleShape(640, 360);
+        var rect2 = new RectangleShape(1280, 720);
 
         var t1 = new Transform(new Vector2(640, 360), 0, new Vector2(1.5f, 1), new Vector2(0, 0));
 
@@ -75,7 +81,7 @@ public partial class MainWindow : Window
         renderCol.Add(new RenderableElement(rect2, col, identity));
         renderCol.Add(new RenderableElement(rect1, null, t1));
 
-        var camera = new Camera2D(1, Matrix3x2.Identity);
+        var camera = new Camera2D(usin + 0.0001f, Transform.Identity);
         return new RasterizerData(camera, 1, renderCol);
     }
 
@@ -104,7 +110,7 @@ public partial class MainWindow : Window
         renderCol.Add(new RenderableElement(rect2, mat2, t2));
         renderCol.Add(new RenderableElement(rect1, mat1, t1));
 
-        var camera = new Camera2D(usin + 0.5f, Matrix3x2.Identity);
+        var camera = new Camera2D(usin + 0.0001f, Transform.Identity);
         return new RasterizerData(camera, 1, renderCol);
     }
 

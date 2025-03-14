@@ -43,7 +43,7 @@ public abstract class NodeDataBase : ObservableObject, INodeData
 
     public virtual RasterizerData GetRenderCommands()
     {
-        return new RasterizerData(new Camera2D(1, Matrix3x2.Identity), 0, []);
+        return new RasterizerData(new Camera2D(1, Transform.Identity), 0, []);
     }
 }
 

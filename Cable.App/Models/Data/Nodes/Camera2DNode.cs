@@ -8,12 +8,12 @@ namespace Cable.App.ViewModels.Data;
 
 [NodeData("Camera2D", CableDataType.None, CableDataType.Geometry2D)]
 [Slot<float, FloatEditor>("Zoom")]
-[Slot<Matrix3x2>("Transform")]
+[Slot<Transform>("Transform")]
 public partial class Camera2DNode : NodeData<Camera2D>
 {
     public override Camera2D GetTypedOutput()
     {
-        return new Camera2D(_zoom, _transform);
+        return new Camera2D(_zoom, Transform);
     }
 }
 

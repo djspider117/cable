@@ -1,8 +1,7 @@
 ﻿using Cable.Data.Types;
 using SkiaSharp;
-using SkiaSharp.Views.Desktop;
 
-namespace Cable.Renderer;
+namespace Cable.Renderer.Renderers;
 
 public class EllipseRenderer
 {

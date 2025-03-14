@@ -2,8 +2,8 @@
 
 namespace Cable.Data.Types;
 
-public readonly struct Camera2D(float zoom, Matrix3x2 transform) : ICableDataType
+public readonly struct Camera2D(float zoom, Transform transform) : ICableDataType
 {
-    public readonly float Material = zoom;
-    public readonly Matrix3x2 Transform = transform;
+    public readonly float Zoom = zoom;
+    public readonly Transform Transform = transform;
 }

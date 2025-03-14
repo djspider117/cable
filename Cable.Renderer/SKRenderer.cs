@@ -72,7 +72,9 @@ public class SKRenderer
         _camera = renderData.Camera;
 
         canvas.Clear(SKColors.Black);
-
+        var updatedTransform = new Transform(_camera.Transform.Translate, _camera.Transform.Rotation, _camera.Transform.Scale * _camera.Zoom, _camera.Transform.OriginOffset);
+        ApplyTransform(canvas, updatedTransform, (_currentFrameInfo?.Width ?? 0) / 2, (_currentFrameInfo?.Height ?? 0) / 2);
+        
         foreach (var element in renderData.Elements)
         {
             Render(canvas, element);
@@ -95,13 +97,18 @@ public class SKRenderer
     private void Render(SKCanvas canvas, IShape shape, IMaterial? material, Transform transform)
     {
         canvas.Save();
-        canvas.Translate(transform.Translate.X, transform.Translate.Y);
-        canvas.RotateDegrees(transform.Rotation);
-        canvas.Scale(transform.Scale.X, transform.Scale.Y);
+        ApplyTransform(canvas, transform);
 
         var renderingFunction = rendererProvider.GetRenderFunction(shape);
         renderingFunction(canvas, shape, material, transform);
 
         canvas.Restore();
+    }
+
+    private void ApplyTransform(SKCanvas canvas, Transform transform, float cx = 0, float cy = 0)
+    {
+        canvas.Translate(transform.Translate.X, transform.Translate.Y);
+        canvas.RotateDegrees(transform.Rotation);
+        canvas.Scale(transform.Scale.X, transform.Scale.Y, cx, cy);
     }
 }

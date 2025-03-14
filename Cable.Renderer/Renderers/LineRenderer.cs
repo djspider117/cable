@@ -1,7 +1,7 @@
 ﻿using Cable.Data.Types;
 using SkiaSharp;
 
-namespace Cable.Renderer;
+namespace Cable.Renderer.Renderers;
 
 public class LineRenderer
 {

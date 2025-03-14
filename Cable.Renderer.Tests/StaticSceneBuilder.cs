@@ -21,7 +21,7 @@ public class StaticSceneBuilder
             10);
 
         return new RasterizerData(
-            new Camera2D(1, Matrix3x2.Identity),
+            new Camera2D(1, Transform.Identity),
             aa: 1,
             [
                                     // RECTANGLE
