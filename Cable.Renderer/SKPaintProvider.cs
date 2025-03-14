@@ -55,7 +55,7 @@ public class SKPaintProvider
             {
                 GradientMaterialData.GradientMaterialType.Horizontal => SKShader.CreateLinearGradient(new SKPoint(0, 0), new SKPoint(width, 0), [color1, color2], null, SKShaderTileMode.Clamp),
                 GradientMaterialData.GradientMaterialType.Vertical => SKShader.CreateLinearGradient(new SKPoint(0, 0), new SKPoint(0, height), [color1, color2], null, SKShaderTileMode.Clamp),
-                GradientMaterialData.GradientMaterialType.Radial => SKShader.CreateRadialGradient(new SKPoint(0.5f * width, 0.5f * height), 0.5f * MathF.Min(width, height), [color1, color2], null, SKShaderTileMode.Clamp),
+                GradientMaterialData.GradientMaterialType.Radial => SKShader.CreateRadialGradient(new SKPoint(0.5f * width, 0.5f * height), 0.5f * MathF.Max(width, height), [color1, color2], null, SKShaderTileMode.Clamp),
                 GradientMaterialData.GradientMaterialType.Angular => SKShader.CreateSweepGradient(new SKPoint(0.5f * width, 0.5f * height), [color1, color2], null),
                 _ => throw new InvalidOperationException("Unsupported gradient type."),
             };
@@ -79,7 +79,7 @@ public class SKPaintProvider
 
                 paint.Shader = SKShader.CreateLinearGradient(
                     new SKPoint(0, 0),
-                    new SKPoint(1, 0),
+                    new SKPoint(width, 0),
                     colors,
                     positions,
                     SKShaderTileMode.Clamp);
