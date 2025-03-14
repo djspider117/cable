@@ -81,11 +81,15 @@ public partial class GraphEditor : UserControl, INodeViewResolver
 
         transformNode.ScaleEditor.ValueX = 1;
         transformNode.ScaleEditor.ValueY = 1;
+        transformNode.RotationEditor.Value = 45;
+        transformNode.TranslationEditor.ValueX = 200;
+        transformNode.TranslationEditor.ValueY = 200;
 
-        var meshNode = new Mesh2DNode();
-        meshNode.GeometryConnection = new Geometry2DConnection(rectNode, meshNode, nameof(Mesh2DNode.Geometry));
-        meshNode.TransformConnection = new Transform2DConnection(transformNode, meshNode, nameof(Mesh2DNode.Transform));
-        meshNode.MaterialConnection = new MaterialConnection(gradientNode, meshNode, nameof(Mesh2DNode.Material));
+
+        var meshNode = new RenderableNode();
+        meshNode.ShapeConnection = new ShapeConnection(rectNode, meshNode, nameof(RenderableNode.Shape));
+        meshNode.TransformConnection = new Transform2DConnection(transformNode, meshNode, nameof(RenderableNode.Transform));
+        meshNode.MaterialConnection = new MaterialConnection(gradientNode, meshNode, nameof(RenderableNode.Material));
 
         var cameraNode = new Camera2DNode();
         cameraNode.ZoomEditor.Value = 1;
@@ -110,7 +114,7 @@ public partial class GraphEditor : UserControl, INodeViewResolver
         pnlNodeContainer.Children.Add(v6);
 
 
-        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v1, v4, meshNode.GeometryConnection));
+        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v1, v4, meshNode.ShapeConnection));
         pnlConnectionsContainer.Children.Add(new NodeConnectionView(v2, v4, meshNode.TransformConnection));
         pnlConnectionsContainer.Children.Add(new NodeConnectionView(v3, v4, meshNode.MaterialConnection));
 

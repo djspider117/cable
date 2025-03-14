@@ -6,14 +6,14 @@ using System.Numerics;
 
 namespace Cable.App.ViewModels.Data;
 
-[NodeData("Mesh2D", CableDataType.None, CableDataType.Mesh2D)]
-[Slot<Geometry2D>("Geometry")]
-[Slot<Matrix3x2>("Transform")]
+[NodeData("Renderable", CableDataType.None, CableDataType.Renderable)]
+[Slot<IShape>("Shape")]
+[Slot<Transform>("Transform")]
 [Slot<IMaterial>("Material")]
-public partial class Mesh2DNode : NodeData<Mesh2D>
+public partial class RenderableNode : NodeData<RenderableElement>
 {
-    public override Mesh2D GetTypedOutput()
+    public override RenderableElement GetTypedOutput()
     {
-        return new Mesh2D(Geometry, Transform, Material);
+        return new RenderableElement(Shape, Material, Transform);
     }
 }

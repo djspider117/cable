@@ -4,6 +4,7 @@ using Cable.App.ViewModels.Data.PropertyEditors;
 using Cable.Data;
 using Cable.Data.Types;
 using System.ComponentModel;
+using System.Numerics;
 
 namespace Cable.App.Models.Data;
 
@@ -40,9 +41,9 @@ public abstract class NodeDataBase : ObservableObject, INodeData
         }
     }
 
-    public virtual RenderCommandList GetRenderCommands()
+    public virtual RasterizerData GetRenderCommands()
     {
-        return new RenderCommandList([]);
+        return new RasterizerData(new Camera2D(1, Matrix3x2.Identity), 0, []);
     }
 }
 

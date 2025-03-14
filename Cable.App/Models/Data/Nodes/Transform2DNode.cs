@@ -1,6 +1,7 @@
 ﻿using Cable.App.Models.Data;
 using Cable.App.ViewModels.Data.PropertyEditors;
 using Cable.Data;
+using Cable.Data.Types;
 using System.Numerics;
 
 namespace Cable.App.ViewModels.Data;
@@ -12,23 +13,23 @@ namespace Cable.App.ViewModels.Data;
 [Slot<Vector2, Float2Editor>("Center")]
 public partial class Transform2DNode : NodeDataBase
 {
-    private Matrix3x2 _transform;
+    //private Matrix3x2 _transform;
 
     public override object? GetOutput()
     {
-        var center = Center;
-        _transform = Matrix3x2.CreateTranslation(Translation) *
-                        Matrix3x2.CreateRotation(Rotation, center) *
-                        Matrix3x2.CreateScale(Scale, center);
+        //var center = Center;
+        //_transform = Matrix3x2.CreateTranslation(Translation) *
+        //                Matrix3x2.CreateRotation(Rotation, center) *
+        //                Matrix3x2.CreateScale(Scale, center);
 
-        var incoming = IncomingData?.GetOutput();
-        if (incoming == null)
-            return _transform;
+        //var incoming = IncomingData?.GetOutput();
+        //if (incoming == null)
+        //    return _transform;
 
-        // Transform the incoming data
-        if (incoming is Vector2 v)
-            return Vector2.Transform(v, _transform);
+        //// Transform the incoming data
+        //if (incoming is Vector2 v)
+        //    return Vector2.Transform(v, _transform);
 
-        return null;
+        return new Transform(Translation, Rotation, Scale, Center);
     }
 }

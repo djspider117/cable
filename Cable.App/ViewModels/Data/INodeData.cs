@@ -13,7 +13,7 @@ public interface INodeData : IDataOutput, INotifyPropertyChanged
     CableDataType OutputType { get; }
 
     IEnumerable<IPropertyEditor> GetPropertyEditors();
-    RenderCommandList GetRenderCommands();
+    RasterizerData GetRenderCommands();
 }
 
 public interface IDataOutput

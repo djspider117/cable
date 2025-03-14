@@ -5,21 +5,27 @@ using Cable.Data.Types;
 
 namespace Cable.App.ViewModels.Data;
 
-[NodeData("Rasterizer", CableDataType.Mesh2D, CableDataType.RenderCommandList)]
+[NodeData("Rasterizer", CableDataType.Renderable, CableDataType.RenderCommandList)]
 [Slot<float, FloatEditor>("AA")]
 [Slot<Camera2D>("Camera")]
-public partial class RasterizerNode : NodeData<RenderCommandList>
+public partial class RasterizerNode : NodeData<RasterizerData>
 {
-    public override RenderCommandList GetTypedOutput()
+    public override RasterizerData GetTypedOutput()
     {
-        var mesh = IncomingData?.GetOutput();
-        if (mesh == null || mesh is not Mesh2D meshData)
-            return new RenderCommandList();
+        var input = IncomingData?.GetOutput();
+        if (input == null)
+            return new RasterizerData();
 
-        return new RenderCommandList([new Mesh2DRenderCommand(meshData, Camera, AA)]);
+        if (input is RenderableElement elem)
+            return new RasterizerData(Camera, AA, [elem]);
+
+        if (input is RenderableCollection col)
+            return new RasterizerData(Camera, AA, col);
+
+        throw new InvalidOperationException();
     }
 
-    public override RenderCommandList GetRenderCommands()
+    public override RasterizerData GetRenderCommands()
     {
         return GetTypedOutput();
     }
