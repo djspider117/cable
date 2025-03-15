@@ -1,22 +1,22 @@
 ﻿using Cable.Data.Types;
 using SkiaSharp;
-using SkiaSharp.Views.Desktop;
 
 namespace Cable.Renderer.Renderers;
 
-public class RectangleRenderer
+public class RectangleRenderer(SKRenderPipeline pipeline)
 {
-    public static void Render(SKCanvas canvas, RectangleShape shape, IMaterial? material, Transform transform)
+    private readonly SKRenderPipeline _pipeline = pipeline;
+    public void Render(SKCanvas canvas, RectangleShape shape, IMaterial? material, Transform transform)
     {
-        using var paint = SKPaintProvider.CreatePaint(material, shape.Width, shape.Height);
+        using var paint = _pipeline.PaintProvider.CreatePaint(material, shape.Width, shape.Height);
         
         var skRect = new SKRect(0, 0, shape.Width, shape.Height);
         canvas.DrawRect(skRect, paint);
     }
 
-    public static void RenderRounded(SKCanvas canvas, RoundedRectangleShape shape, IMaterial? material, Transform transform)
+    public void RenderRounded(SKCanvas canvas, RoundedRectangleShape shape, IMaterial? material, Transform transform)
     {
-        using var paint = SKPaintProvider.CreatePaint(material, shape.Width, shape.Height);
+        using var paint = _pipeline.PaintProvider.CreatePaint(material, shape.Width, shape.Height);
 
         var skRect = new SKRect(0, 0, shape.Width, shape.Height);
         var roundedRect = new SKRoundRect(skRect, shape.Radius);

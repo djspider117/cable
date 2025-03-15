@@ -15,5 +15,8 @@
         <Button x:Name="btnSceneCycle" Content="Cycle" Click="btnSceneCycle_Click"
                 HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10"
                 Width="100" Height="40"/>
+        <Button x:Name="btnSaveReference" Content="Save Reference" Click="btnSaveReference_Click"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10"
+                Width="100" Height="40"/>
     </Grid>
 </Window>

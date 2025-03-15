@@ -17,7 +17,12 @@ public class AnimatedRenderViewer : FrameworkElement
     public const double BITMAP_DPI = 96.0;
 
     private WriteableBitmap? _bitmap;
+    private nint _backBuffer;
+    private int _backBufferStride;
     private bool _ignorePixelScaling;
+    private bool _isRendering;
+    private Thread _renderingThread;
+    private Matrix _transformToDevice = Matrix.Identity;
 
     public Vector2 ComputedSize => Renderer?.DesiredSize != null ? Renderer.DesiredSize.Value : new Vector2((float)ActualWidth, (float)ActualHeight);
     public SKSize CanvasSize { get; private set; }
@@ -35,7 +40,22 @@ public class AnimatedRenderViewer : FrameworkElement
 
     public AnimatedRenderViewer()
     {
+        Loaded += AnimatedRenderViewer_Loaded;
+        Unloaded += AnimatedRenderViewer_Unloaded;
         CompositionTarget.Rendering += CompositionTarget_Rendering;
+    }
+
+    private void AnimatedRenderViewer_Loaded(object sender, RoutedEventArgs e)
+    {
+        _isRendering = true;
+        Task.Run(RenderContent);
+
+    }
+
+    private void AnimatedRenderViewer_Unloaded(object sender, RoutedEventArgs e)
+    {
+        Unloaded -= AnimatedRenderViewer_Unloaded;
+        _isRendering = false;
     }
 
     private void CompositionTarget_Rendering(object? sender, EventArgs e)
@@ -43,47 +63,103 @@ public class AnimatedRenderViewer : FrameworkElement
         InvalidateVisual();
     }
 
+    private bool _renderingContent;
+    private SKImageInfo _info;
+    private float _scaleX;
+    private float _scaleY;
+    private SKSizeI _userVisibleSize;
+    private readonly ManualResetEventSlim _hEvent = new(true);
+
+    private void RenderContent()
+    {
+        while (_isRendering)
+        {
+            if (Renderer == null)
+                return;
+
+            _renderingContent = true;
+
+            _hEvent.Wait();
+
+            using (var surface = SKSurface.Create(_info, _backBuffer, _backBufferStride))
+            {
+                if (IgnorePixelScaling)
+                {
+                    var canvas = surface.Canvas;
+                    canvas.Scale(_scaleX, _scaleY);
+                    canvas.Save();
+                }
+
+                var e = new SKPaintSurfaceEventArgs(surface, _info.WithSize(_userVisibleSize), _info);
+
+                Renderer.Render(e);
+            }
+
+            var w = _info.Width;
+            var h = _info.Height;
+            _renderingContent = false;
+
+            _hEvent.Reset();
+            Thread.Sleep(16);
+        }
+    }
+
+    private bool _isBitmapLocked = false;
+    private WriteableBitmap _lastRenderedFrame;
+
     protected override void OnRender(DrawingContext drawingContext)
     {
         base.OnRender(drawingContext);
-        if (Renderer == null)
+
+        if (!_hEvent.IsSet && _isBitmapLocked)
+        {
+            _bitmap.AddDirtyRect(new Int32Rect(0, 0, _info.Width, _info.Height));
+            _bitmap.Unlock();
+
+            _lastRenderedFrame = _bitmap.Clone();
+            _lastRenderedFrame.Freeze();
+
+            drawingContext.DrawImage(_bitmap, new Rect(0, 0, ActualWidth, ActualHeight));
+            _isBitmapLocked = false;
             return;
+        }
 
         if (Visibility != Visibility.Visible || PresentationSource.FromVisual(this) == null)
             return;
 
-        var size = CreateSize(out var unscaledSize, out var scaleX, out var scaleY);
-        var userVisibleSize = IgnorePixelScaling ? unscaledSize : size;
+        _transformToDevice = PresentationSource.FromVisual(this).CompositionTarget.TransformToDevice;
 
-        CanvasSize = userVisibleSize;
+        var size = CreateSize(out var unscaledSize, out var scaleX, out var scaleY);
+        _scaleX = scaleX;
+        _scaleY = scaleY;
+        _userVisibleSize = IgnorePixelScaling ? unscaledSize : size;
+
+        CanvasSize = _userVisibleSize;
 
         if (size.Width <= 0 || size.Height <= 0)
             return;
 
-        var info = new SKImageInfo(size.Width, size.Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
+        _info = new SKImageInfo(size.Width, size.Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
 
-        if (_bitmap == null || info.Width != _bitmap.PixelWidth || info.Height != _bitmap.PixelHeight)
+        if (!_renderingContent)
         {
-            _bitmap = new WriteableBitmap(info.Width, size.Height, BITMAP_DPI * scaleX, BITMAP_DPI * scaleY, PixelFormats.Pbgra32, null);
-        }
-
-        _bitmap.Lock();
-        using (var surface = SKSurface.Create(info, _bitmap.BackBuffer, _bitmap.BackBufferStride))
-        {
-            if (IgnorePixelScaling)
+            if (_bitmap == null || _info.Width != _bitmap.PixelWidth || _info.Height != _bitmap.PixelHeight)
             {
-                var canvas = surface.Canvas;
-                canvas.Scale(scaleX, scaleY);
-                canvas.Save();
+                _bitmap = new WriteableBitmap(_info.Width, size.Height, BITMAP_DPI * scaleX, BITMAP_DPI * scaleY, PixelFormats.Pbgra32, null);
+                _backBuffer = _bitmap.BackBuffer;
+                _backBufferStride = _bitmap.BackBufferStride;
             }
-
-            var e = new SKPaintSurfaceEventArgs(surface, info.WithSize(userVisibleSize), info);
-            Renderer.Render(e);
         }
 
-        _bitmap.AddDirtyRect(new Int32Rect(0, 0, info.Width, size.Height));
-        _bitmap.Unlock();
-        drawingContext.DrawImage(_bitmap, new Rect(0, 0, ActualWidth, ActualHeight));
+        if (!_isBitmapLocked)
+        {
+            _bitmap.Lock();
+            _isBitmapLocked = true;
+        }
+        _hEvent.Set();
+
+
+        drawingContext.DrawImage(_lastRenderedFrame, new Rect(0, 0, ActualWidth, ActualHeight));
     }
 
     protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
@@ -107,7 +183,7 @@ public class AnimatedRenderViewer : FrameworkElement
 
         unscaledSize = new SKSizeI((int)w, (int)h);
 
-        var m = PresentationSource.FromVisual(this).CompositionTarget.TransformToDevice;
+        var m = _transformToDevice;
         scaleX = (float)m.M11;
         scaleY = (float)m.M22;
         return new SKSizeI((int)(w * scaleX), (int)(h * scaleY));

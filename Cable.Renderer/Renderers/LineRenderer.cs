@@ -3,13 +3,15 @@ using SkiaSharp;
 
 namespace Cable.Renderer.Renderers;
 
-public class LineRenderer
+public class LineRenderer(SKRenderPipeline pipeline)
 {
-    public static void Render(SKCanvas canvas, LineShape shape, IMaterial? material, Transform transform)
+    private readonly SKRenderPipeline _pipeline = pipeline;
+
+    public void Render(SKCanvas canvas, LineShape shape, IMaterial? material, Transform transform)
     {
         var sz = shape.End - shape.Start;
 
-        using var paint = SKPaintProvider.CreatePaint(material, MathF.Abs(sz.X), MathF.Abs(sz.Y));
+        using var paint = _pipeline.PaintProvider.CreatePaint(material, MathF.Abs(sz.X), MathF.Abs(sz.Y));
         paint.IsStroke = true;
         paint.StrokeWidth = shape.Thickness;
 

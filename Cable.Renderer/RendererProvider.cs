@@ -8,22 +8,33 @@ namespace Cable.Renderer;
 
 public class RendererProvider
 {
+    private readonly RectangleRenderer _rectRenderer;
+    private readonly EllipseRenderer _elliRenderer;
+    private readonly LineRenderer _lineRenderer;
+
+    public RendererProvider(SKRenderPipeline pipeline)
+    {
+        _rectRenderer = new RectangleRenderer(pipeline);
+        _lineRenderer = new LineRenderer(pipeline);
+        _elliRenderer = new EllipseRenderer(pipeline);
+    }
+
     public Action<SKCanvas, IShape, IMaterial?, Transform> GetRenderFunction(IShape shape)
     {
         if (shape is RectangleShape rectangleShape)
-            return (e, shape, mat, transform) => RectangleRenderer.Render(e, rectangleShape, mat, transform);
+            return (e, shape, mat, transform) => _rectRenderer.Render(e, rectangleShape, mat, transform);
 
         if (shape is RoundedRectangleShape roundedRectangleShape)
-            return (e, shape, mat, transform) => RectangleRenderer.RenderRounded(e, roundedRectangleShape, mat, transform);
+            return (e, shape, mat, transform) => _rectRenderer.RenderRounded(e, roundedRectangleShape, mat, transform);
 
         if (shape is EllipseShape es)
-            return (e, shape, mat, transform) => EllipseRenderer.Render(e, es, mat, transform);
+            return (e, shape, mat, transform) => _elliRenderer.Render(e, es, mat, transform);
 
         if (shape is CircleShape cs)
-            return (e, shape, mat, transform) => EllipseRenderer.RenderCircle(e, cs, mat, transform);
+            return (e, shape, mat, transform) => _elliRenderer.RenderCircle(e, cs, mat, transform);
 
         if (shape is LineShape ls)
-            return (e, shape, mat, transform) => LineRenderer.Render(e, ls, mat, transform);
+            return (e, shape, mat, transform) => _lineRenderer.Render(e, ls, mat, transform);
 
         throw new ArgumentException(null, nameof(shape));
     }

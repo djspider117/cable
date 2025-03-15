@@ -16,4 +16,20 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Cable.Data\Cable.Data.csproj" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Shaders\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Shaders\AnimatedColors.glsl">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Shaders\PerlinNoise.glsl">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Shaders\Tunnel.glsl">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 </Project>

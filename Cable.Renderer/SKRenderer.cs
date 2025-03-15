@@ -11,10 +11,10 @@ public class SKRenderer
 {
     public event EventHandler<Vector2?>? DesiredSizeChanged;
 
-    private readonly RendererProvider rendererProvider = new();
+    private readonly RendererProvider rendererProvider;
     private readonly ConcurrentQueue<RasterizerData> _renderQueue = new();
+    private readonly SKRenderPipeline _pipeline;
 
-    private float _aa;
     private Camera2D _camera;
 
     private SKImageInfo? _currentFrameInfo;
@@ -38,6 +38,12 @@ public class SKRenderer
     public void SetCurrentSurface(SKSurface? curSurface) => _currentFrameSurface = curSurface;
 
     #endregion
+
+    internal SKRenderer(SKRenderPipeline pipeline)
+    {
+        _pipeline = pipeline;
+        rendererProvider = new RendererProvider(pipeline);
+    }
 
     public void PushFrame(RasterizerData rasterizerData)
     {
@@ -68,7 +74,7 @@ public class SKRenderer
 
     private void Render(SKCanvas canvas, RasterizerData renderData)
     {
-        _aa = renderData.AA;
+        //_aa = renderData.AA;
         _camera = renderData.Camera;
 
         canvas.Clear(SKColors.Black);

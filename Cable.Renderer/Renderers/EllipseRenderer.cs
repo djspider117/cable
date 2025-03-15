@@ -3,19 +3,21 @@ using SkiaSharp;
 
 namespace Cable.Renderer.Renderers;
 
-public class EllipseRenderer
+public class EllipseRenderer(SKRenderPipeline pipeline)
 {
-    public static void Render(SKCanvas canvas, EllipseShape shape, IMaterial? material, Transform transform)
+    private readonly SKRenderPipeline _pipeline = pipeline;
+
+    public void Render(SKCanvas canvas, EllipseShape shape, IMaterial? material, Transform transform)
     {
-        using var paint = SKPaintProvider.CreatePaint(material, shape.Width, shape.Height);
+        using var paint = _pipeline.PaintProvider.CreatePaint(material, shape.Width, shape.Height);
 
         var skRect = new SKRect(0, 0, shape.Width, shape.Height);
         canvas.DrawOval(skRect, paint);
     }
 
-    public static void RenderCircle(SKCanvas canvas, CircleShape shape, IMaterial? material, Transform transform)
+    public void RenderCircle(SKCanvas canvas, CircleShape shape, IMaterial? material, Transform transform)
     {
-        using var paint = SKPaintProvider.CreatePaint(material, shape.Size, shape.Size);
+        using var paint = _pipeline.PaintProvider.CreatePaint(material, shape.Size, shape.Size);
 
         var skRect = new SKRect(0, 0, shape.Size, shape.Size);
         canvas.DrawOval(skRect, paint);
