@@ -32,6 +32,7 @@ public partial class GraphEditor : UserControl, INodeViewResolver
 
     private readonly Dictionary<NodeViewModel, NodeView> _nodeMapping = [];
     private NodeConnectionView? _pendingConnection;
+    private Point? _lastMove;
 
     public NodeView? SelectedNodeView
     {
@@ -49,6 +50,22 @@ public partial class GraphEditor : UserControl, INodeViewResolver
         Application.Current.MainWindow.MouseUp += MainWindow_MouseUp;
 
         Loaded += GraphEditor_Loaded;
+    }
+
+    protected override void OnMouseMove(MouseEventArgs e)
+    {
+        base.OnMouseMove(e);
+        if (e.MiddleButton == MouseButtonState.Pressed && _lastMove != null)
+        {
+            var delta = e.GetPosition(this) - _lastMove;
+            foreach (NodeView item in pnlNodeContainer.Children)
+            {
+                item.X += delta.Value.X;
+                item.Y += delta.Value.Y;
+            }
+        }
+
+        _lastMove = e.GetPosition(this);
     }
 
     private async void GraphEditor_Loaded(object sender, RoutedEventArgs e)
