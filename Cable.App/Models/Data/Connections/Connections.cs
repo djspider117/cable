@@ -28,3 +28,8 @@ public partial class GenericPropertyConnection(INodeData source, INodeData targe
     : DataConnection<object>(source, target, propName, sourceName)
 {
 }
+
+public partial class GenericConnection(INodeData source, INodeData target)
+    : DataConnection<object>(source, target, null, null)
+{
+}

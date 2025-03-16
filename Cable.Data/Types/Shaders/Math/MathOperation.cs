@@ -1,4 +1,4 @@
-﻿namespace Cable.Data.Types.Shaders;
+﻿namespace Cable.Data.Types.Shaders.Math;
 
 public abstract class MathOperation : ShaderInstructionBase, IExpression, IOperand
 {

@@ -1,4 +1,4 @@
-﻿namespace Cable.Data.Types.Shaders;
+﻿namespace Cable.Data.Types.Shaders.Trig;
 
 public class Cos : ShaderInstructionBase, ITrigFunction
 {

@@ -16,6 +16,9 @@ public partial class NodeViewModel : ObservableObject
     [ObservableProperty]
     private double _y = 0d;
 
+    [ObservableProperty]
+    private bool _isSelected = false;
+
     public NodeDataBase Data => _data;
     public string Title => _data.Title;
     public CableDataType InputType => _data.InputType;
@@ -29,9 +32,19 @@ public partial class NodeViewModel : ObservableObject
         PropertyEditors = [];
     }
 
+    public NodeViewModel(INodeData data)
+    {
+        _data = (NodeDataBase)data;
+        X = data.X;
+        Y = data.Y;
+        PropertyEditors = data.GetPropertyEditors();
+    }
+
     public NodeViewModel(NodeDataBase data)
     {
         _data = data;
+        X = data.X;
+        Y = data.Y;
         PropertyEditors = data.GetPropertyEditors();
     }
 }

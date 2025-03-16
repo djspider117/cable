@@ -18,6 +18,9 @@ using System.IO;
 using System.Windows.Threading;
 using Cable.Data.Types.MaterialData;
 using Cable.Data.Types.Shaders;
+using Cable.Data.Types.Shaders.Trig;
+using Cable.Data.Types.Shaders.Math;
+using Cable.Data.Types.Shaders.Special;
 
 namespace Cable.Renderer.Development;
 

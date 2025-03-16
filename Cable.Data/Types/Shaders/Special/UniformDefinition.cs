@@ -1,4 +1,6 @@
-﻿namespace Cable.Data.Types.Shaders;
+﻿using Cable.Data.Extensions;
+
+namespace Cable.Data.Types.Shaders.Special;
 
 public enum ShaderValueType
 {

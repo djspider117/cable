@@ -1,6 +1,8 @@
-﻿namespace Cable.Data.Types.Shaders;
+﻿using Cable.Data.Types.Shaders.Special;
 
-public static class Extensions
+namespace Cable.Data.Extensions;
+
+public static class ShaderExtensions
 {
     public static string ToShaderString(this ShaderValueType builder)
     {

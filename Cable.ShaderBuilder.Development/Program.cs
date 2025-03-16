@@ -1,4 +1,7 @@
 ﻿using Cable.Data.Types.Shaders;
+using Cable.Data.Types.Shaders.Math;
+using Cable.Data.Types.Shaders.Special;
+using Cable.Data.Types.Shaders.Trig;
 using System.Numerics;
 
 namespace Cable.ShaderBuilder.Development;

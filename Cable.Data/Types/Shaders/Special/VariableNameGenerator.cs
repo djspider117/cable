@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Cable.Data.Types.Shaders;
+namespace Cable.Data.Types.Shaders.Special;
 
 public class VariableNameGenerator
 {

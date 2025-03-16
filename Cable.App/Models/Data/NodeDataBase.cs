@@ -10,7 +10,11 @@ namespace Cable.App.Models.Data;
 
 public abstract class NodeDataBase : ObservableObject, INodeData
 {
+    public long Id { get; set; }
     public string Title { get; }
+    public double X { get; set; }
+    public double Y { get; set; }
+
     public CableDataType InputType { get; }
     public CableDataType OutputType { get; }
 
@@ -53,6 +57,7 @@ public abstract class NodeDataBase : ObservableObject, INodeData
     {
         return null;
     }
+
 }
 
 public abstract class NodeData<T> : NodeDataBase where T : ICableDataType

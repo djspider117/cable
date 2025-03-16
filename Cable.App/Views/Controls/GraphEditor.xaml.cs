@@ -2,16 +2,25 @@
 using Cable.App.Models.Data;
 using Cable.App.Models.Data.Connections;
 using Cable.App.Models.Messages;
+using Cable.App.Services;
 using Cable.App.ViewModels.Data;
 using Cable.App.ViewModels.Data.PropertyEditors;
 using Cable.Core;
+using Cable.Data.Serialization;
 using Cable.Data.Types;
+using Cable.Data.Types.MaterialData;
+using Cable.Data.Types.Shaders;
 using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,18 +30,31 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml.Linq;
 
 namespace Cable.App.Views.Controls;
 
 public partial class GraphEditor : UserControl, INodeViewResolver
 {
+    #region PropDP
+
     public static readonly DependencyProperty SelectedNodeViewProperty =
         DependencyProperty.Register(nameof(SelectedNodeView), typeof(NodeView), typeof(GraphEditor), new PropertyMetadata(null));
 
+    #endregion
+
+    #region Fields
 
     private readonly Dictionary<NodeViewModel, NodeView> _nodeMapping = [];
     private NodeConnectionView? _pendingConnection;
     private Point? _lastMove;
+
+    private List<NodeView> _nodeViews = [];
+    private List<NodeConnectionView> _connectionViews = [];
+
+    #endregion
+
+    #region Properties
 
     public NodeView? SelectedNodeView
     {
@@ -40,225 +62,33 @@ public partial class GraphEditor : UserControl, INodeViewResolver
         set => SetValue(SelectedNodeViewProperty, value);
     }
 
+    public ObservableCollection<NodeViewModel> NodeViewModels { get; init; } = [];
+    public ObservableCollection<ConnectionViewModel> ConnectionViewModels { get; init; } = [];
+
+    #endregion
+
     public GraphEditor()
     {
         InitializeComponent();
 
-        BuildDemoGraph4();
-
         WeakReferenceMessenger.Default.Register<StartNodeConnectionMessage>(this, OnStartNodeConnectionMessage);
         Application.Current.MainWindow.MouseUp += MainWindow_MouseUp;
+
+        NodeViewModels.CollectionChanged += NodeViewModels_CollectionChanged;
+        ConnectionViewModels.CollectionChanged += ConnectionViewModels_CollectionChanged;
+
+        LoadPatch(DemoPatches.BuildDemo());
 
         Loaded += GraphEditor_Loaded;
     }
 
-    protected override void OnMouseMove(MouseEventArgs e)
-    {
-        base.OnMouseMove(e);
-        if (e.MiddleButton == MouseButtonState.Pressed && _lastMove != null)
-        {
-            var delta = e.GetPosition(this) - _lastMove;
-            foreach (NodeView item in pnlNodeContainer.Children)
-            {
-                item.X += delta.Value.X;
-                item.Y += delta.Value.Y;
-            }
-        }
 
-        _lastMove = e.GetPosition(this);
-    }
+    #region Event Handlers
 
     private async void GraphEditor_Loaded(object sender, RoutedEventArgs e)
     {
         await Task.Delay(100);
         PerformAutoLayout();
-    }
-
-    private void BuildDemoGraph()
-    {
-        var numberNode = new FloatNode(10.2f);
-        var vectorNode = new Float2Node(new Vector2(5, 12));
-        var transformNode = new Transform2DNode();
-
-        var c1 = new FloatConnection(numberNode, transformNode, "Rotation");
-        var c2 = new Float2Connection(vectorNode, transformNode, "Translation");
-
-        transformNode.RotationConnection = c1;
-        transformNode.TranslationConnection = c2;
-
-        var v1 = new NodeView() { ViewModel = new NodeViewModel(numberNode) };
-        var v2 = new NodeView() { ViewModel = new NodeViewModel(vectorNode) };
-        var v3 = new NodeView() { ViewModel = new NodeViewModel(transformNode) };
-
-        pnlNodeContainer.Children.Add(v1);
-        pnlNodeContainer.Children.Add(v2);
-        pnlNodeContainer.Children.Add(v3);
-
-        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v1, v3, c1));
-        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v2, v3, c2));
-    }
-
-    private void BuildDemoGraph2()
-    {
-        var scene = App.GetService<CableSceneViewModel>()!;
-
-        var timelineNode = new TimelineNode(scene.Timeline);
-
-        var rectNode = new RectangleNode();
-        var transformNode = new Transform2DNode();
-        var gradientNode = new GradienteNode();
-
-        rectNode.WidthConnection = new UIntToFloatConnection(timelineNode, rectNode, "Width", "FrameIndex");
-
-        //rectNode.WidthEditor.Value = 100;
-        rectNode.HeightEditor.Value = 50;
-
-        transformNode.ScaleEditor.ValueX = 1;
-        transformNode.ScaleEditor.ValueY = 1;
-        transformNode.RotationEditor.Value = 45;
-        transformNode.TranslationEditor.ValueX = 200;
-        transformNode.TranslationEditor.ValueY = 200;
-
-
-        var meshNode = new RenderableNode();
-        meshNode.ShapeConnection = new ShapeConnection(rectNode, meshNode, nameof(RenderableNode.Shape));
-        meshNode.TransformConnection = new Transform2DConnection(transformNode, meshNode, nameof(RenderableNode.Transform));
-        meshNode.MaterialConnection = new MaterialConnection(gradientNode, meshNode, nameof(RenderableNode.Material));
-
-        var cameraNode = new Camera2DNode();
-        cameraNode.ZoomEditor.Value = 1;
-
-        var renderer = new RasterizerNode { IncomingData = meshNode };
-        renderer.CameraConnection = new Camera2DConnection(cameraNode, renderer, nameof(RasterizerNode.Camera));
-
-        // views
-
-        var v0 = new NodeView() { ViewModel = new NodeViewModel(timelineNode) };
-        var v1 = new NodeView() { ViewModel = new NodeViewModel(rectNode) };
-        var v2 = new NodeView() { ViewModel = new NodeViewModel(transformNode) };
-        var v3 = new NodeView() { ViewModel = new NodeViewModel(gradientNode) };
-        var v4 = new NodeView() { ViewModel = new NodeViewModel(meshNode) };
-        var v5 = new NodeView() { ViewModel = new NodeViewModel(cameraNode) };
-        var v6 = new NodeView() { ViewModel = new NodeViewModel(renderer) };
-
-        pnlNodeContainer.Children.Add(v0);
-        pnlNodeContainer.Children.Add(v1);
-        pnlNodeContainer.Children.Add(v2);
-        pnlNodeContainer.Children.Add(v3);
-        pnlNodeContainer.Children.Add(v4);
-        pnlNodeContainer.Children.Add(v5);
-        pnlNodeContainer.Children.Add(v6);
-
-
-        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v0, v1, rectNode.WidthConnection));
-        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v1, v4, meshNode.ShapeConnection));
-        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v2, v4, meshNode.TransformConnection));
-        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v3, v4, meshNode.MaterialConnection));
-
-        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v4, v6, null));
-        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v5, v6, renderer.CameraConnection));
-        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v5, v6, renderer.CameraConnection));
-
-        SelectedNodeView = v6;
-        monitor.NodeToPreview = v6;
-    }
-
-    private void BuildDemoGraph3()
-    {
-        var scene = App.GetService<CableSceneViewModel>()!;
-
-        var timelineNode = new TimelineNode(scene.Timeline);
-        var floatNode = new FloatNode(0);
-
-        var c1 = new UIntToFloatConnection(timelineNode, floatNode, "Value", "FrameIndex");
-
-
-        var v1 = new NodeView() { ViewModel = new NodeViewModel(timelineNode) };
-        var v2 = new NodeView() { ViewModel = new NodeViewModel(floatNode) };
-
-        pnlNodeContainer.Children.Add(v1);
-        pnlNodeContainer.Children.Add(v2);
-
-        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v1, v2, c1));
-    }
-
-
-    private void BuildDemoGraph4()
-    {
-        var scene = App.GetService<CableSceneViewModel>()!;
-
-        var timelineNode = new TimelineNode(scene.Timeline);
-        var uniformsNode = new UniformsNode(new()
-        {
-            { "iTime", 0f },
-            { "iResolution", new Vector2(1280, 720) }
-        });
-
-        var rectNode = new RectangleNode();
-        var transformNode = new Transform2DNode();
-        var shaderNode = new CustomShaderNode();
-
-        rectNode.WidthEditor.Value = 1280;
-        rectNode.HeightEditor.Value = 720;
-
-        shaderNode.SetShaderFile(new Data.Types.Shaders.FileData(@"Shaders\Tunnel.glsl"));
-        shaderNode.UniformsConnection = new UniformCollectionConnection(uniformsNode, shaderNode, "Uniforms");
-
-        uniformsNode.AddConnectionForCollection("iTime", new GenericPropertyConnection(timelineNode, uniformsNode, "iTime", "FrameTime"));
-
-        transformNode.ScaleEditor.ValueX = 1;
-        transformNode.ScaleEditor.ValueY = 1;
-        transformNode.RotationEditor.Value = 0;
-        transformNode.TranslationEditor.ValueX = 0;
-        transformNode.TranslationEditor.ValueY = 0;
-
-
-
-
-        var meshNode = new RenderableNode();
-        meshNode.ShapeConnection = new ShapeConnection(rectNode, meshNode, nameof(RenderableNode.Shape));
-        meshNode.TransformConnection = new Transform2DConnection(transformNode, meshNode, nameof(RenderableNode.Transform));
-        meshNode.MaterialConnection = new MaterialConnection(shaderNode, meshNode, nameof(RenderableNode.Material));
-
-        var cameraNode = new Camera2DNode();
-        cameraNode.ZoomEditor.Value = 1;
-
-        var renderer = new RasterizerNode { IncomingData = meshNode };
-        renderer.CameraConnection = new Camera2DConnection(cameraNode, renderer, nameof(RasterizerNode.Camera));
-
-        // views
-
-        var q0 = new NodeView() { ViewModel = new NodeViewModel(timelineNode) };
-        var v0 = new NodeView() { ViewModel = new NodeViewModel(uniformsNode) };
-        var v1 = new NodeView() { ViewModel = new NodeViewModel(rectNode) };
-        var v2 = new NodeView() { ViewModel = new NodeViewModel(transformNode) };
-        var v3 = new NodeView() { ViewModel = new NodeViewModel(shaderNode) };
-        var v4 = new NodeView() { ViewModel = new NodeViewModel(meshNode) };
-        var v5 = new NodeView() { ViewModel = new NodeViewModel(cameraNode) };
-        var v6 = new NodeView() { ViewModel = new NodeViewModel(renderer) };
-
-        pnlNodeContainer.Children.Add(q0);
-        pnlNodeContainer.Children.Add(v0);
-        pnlNodeContainer.Children.Add(v1);
-        pnlNodeContainer.Children.Add(v2);
-        pnlNodeContainer.Children.Add(v3);
-        pnlNodeContainer.Children.Add(v4);
-        pnlNodeContainer.Children.Add(v5);
-        pnlNodeContainer.Children.Add(v6);
-
-
-        pnlConnectionsContainer.Children.Add(new NodeConnectionView(q0, v0, timelineNode.FrameTimeConnection));
-        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v0, v3, shaderNode.UniformsConnection));
-        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v1, v4, meshNode.ShapeConnection));
-        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v2, v4, meshNode.TransformConnection));
-        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v3, v4, meshNode.MaterialConnection));
-
-        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v4, v6, null));
-        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v5, v6, renderer.CameraConnection));
-        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v5, v6, renderer.CameraConnection));
-
-        SelectedNodeView = v6;
-        monitor.NodeToPreview = v6;
     }
 
     private void MainWindow_MouseUp(object sender, MouseButtonEventArgs e)
@@ -280,21 +110,157 @@ public partial class GraphEditor : UserControl, INodeViewResolver
             }
         }
 
+        if (e.OriginalSource is FrameworkElement fe2)
+        {
+            var nv = fe2.FindVisualParent<NodeView>()!;
+            if (_pendingConnection == null)
+            {
+                Select(nv);
+            }
+        }
 
         if (_pendingConnection?.Destination == null)
             pnlConnectionsContainer.Children.Remove(_pendingConnection);
     }
 
-    private void OnStartNodeConnectionMessage(object recipient, StartNodeConnectionMessage message)
+    private void btnPerformLayout_Click(object sender, RoutedEventArgs e)
     {
-        _pendingConnection = new NodeConnectionView(message.SourceView, null, null!);
-        pnlConnectionsContainer.Children.Add(_pendingConnection);
+        PerformAutoLayout();
     }
 
-    public NodeView? GetViewFromViewModel(NodeViewModel? vm)
+    #endregion
+
+    #region Selection
+
+    public void Select(NodeViewModel? vm)
     {
-        throw new NotImplementedException();
+        var nv = GetViewFromViewModel(vm);
+        Select(nv);
     }
+
+    public void Select(NodeView? nv)
+    {
+        if (SelectedNodeView != null)
+            SelectedNodeView.ViewModel.IsSelected = false;
+
+        SelectedNodeView = nv;
+        monitor.NodeToPreview = nv;
+
+        if (nv != null)
+            nv.ViewModel.IsSelected = true;
+    }
+
+    #endregion
+
+    #region Overrides
+    protected override void OnMouseMove(MouseEventArgs e)
+    {
+        base.OnMouseMove(e);
+        if (e.MiddleButton == MouseButtonState.Pressed && _lastMove != null)
+        {
+            var delta = e.GetPosition(this) - _lastMove;
+            foreach (NodeView item in pnlNodeContainer.Children)
+            {
+                item.X += delta.Value.X;
+                item.Y += delta.Value.Y;
+            }
+        }
+
+        _lastMove = e.GetPosition(this);
+    }
+    #endregion
+
+    #region Save/Load
+
+    private void NodeViewModels_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
+        {
+            foreach (NodeViewModel vm in e.NewItems)
+            {
+                var view = new NodeView() { ViewModel = vm };
+                _nodeViews.Add(view);
+                pnlNodeContainer.Children.Add(view);
+            }
+        }
+
+        if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems != null)
+        {
+            foreach (NodeViewModel vm in e.OldItems)
+            {
+                // TODO
+            }
+        }
+
+        if (e.Action == NotifyCollectionChangedAction.Reset)
+        {
+            // TODO
+        }
+
+
+    }
+    private void ConnectionViewModels_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
+        {
+            foreach (ConnectionViewModel vm in e.NewItems)
+            {
+                var connView = new NodeConnectionView(vm, this);
+                pnlConnectionsContainer.Children.Add(connView);
+                _connectionViews.Add(connView);
+            }
+        }
+
+        if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems != null)
+        {
+            foreach (NodeViewModel vm in e.OldItems)
+            {
+                // TODO
+            }
+        }
+
+        if (e.Action == NotifyCollectionChangedAction.Reset)
+        {
+            // TODO
+        }
+    }
+
+    public void LoadPatch(PatchData patchData)
+    {
+        var nodeVms = new Dictionary<long, NodeViewModel>();
+        foreach (var node in patchData.Nodes)
+        {
+            var vm = new NodeViewModel(node);
+            NodeViewModels.Add(vm);
+            nodeVms.Add(node.Id, vm);
+        }
+
+        foreach (var conn in patchData.Connections)
+        {
+            var srcvm = nodeVms[conn.SourceNode.Id];
+            var trgvm = nodeVms[conn.TargetNode.Id];
+            var cvm = new ConnectionViewModel(srcvm, trgvm, conn);
+            ConnectionViewModels.Add(cvm);
+        }
+
+        if (patchData.SelectedNodeId is not null)
+        {
+            Select(nodeVms[patchData.SelectedNodeId.Value]);
+        }
+    }
+
+    public PatchData SavePatch()
+    {
+        var rv = new PatchData();
+
+
+
+        return rv;
+    }
+
+    #endregion
+
+    #region Layout
 
     public void PerformAutoLayout()
     {
@@ -306,7 +272,6 @@ public partial class GraphEditor : UserControl, INodeViewResolver
         var layout = new GraphLayout<NodeView>();
         layout.Layout(graph.Root, 0, ActualWidth - 650);
     }
-
     public Graph<NodeView> GetNodeViewGraph()
     {
         var nodes = new List<GraphItem<NodeView>>();
@@ -357,8 +322,79 @@ public partial class GraphEditor : UserControl, INodeViewResolver
         return new Graph<NodeView> { Root = root };
     }
 
-    private void btnPerformLayout_Click(object sender, RoutedEventArgs e)
+    public NodeView? GetViewFromViewModel(NodeViewModel? vm)
     {
-        PerformAutoLayout();
+        return _nodeViews.Find(x => x.ViewModel == vm);
+    }
+
+    #endregion
+
+    #region Message Handlers
+
+    private void OnStartNodeConnectionMessage(object recipient, StartNodeConnectionMessage message)
+    {
+        _pendingConnection = new NodeConnectionView(message.SourceView, null, null!);
+        pnlConnectionsContainer.Children.Add(_pendingConnection);
+    }
+
+    #endregion
+}
+
+public class DemoPatches
+{
+    public static PatchData BuildDemo()
+    {
+        var scene = App.GetService<CableSceneViewModel>()!;
+        var rv = new PatchData();
+
+        // nodes
+        var timelineNode = new TimelineNode(scene.Timeline) { Id = 0 };
+        var uniformsNode = new UniformsNode(new()
+        {
+            { "iTime", 0f },
+            { "iResolution", new Vector2(1280, 720) }
+        })
+        { Id = 1 };
+        var rectNode = new RectangleNode() { Id = 2 };
+        var transformNode = new Transform2DNode() { Id = 3 };
+        var shaderNode = new CustomShaderNode() { Id = 4 };
+        var cameraNode = new Camera2DNode() { Id = 5 };
+        var meshNode = new RenderableNode() { Id = 6 };
+        var renderer = new RasterizerNode { IncomingData = meshNode, Id = 7 };
+
+        // default values
+        shaderNode.SetShaderFile(new FileData(@"Shaders\FractalPyramid.glsl"));
+        rectNode.WidthEditor.Value = 1280;
+        rectNode.HeightEditor.Value = 720;
+        transformNode.ScaleEditor.ValueX = 1;
+        transformNode.ScaleEditor.ValueY = 1;
+        transformNode.RotationEditor.Value = 0;
+        transformNode.TranslationEditor.ValueX = 0;
+        transformNode.TranslationEditor.ValueY = 0;
+        cameraNode.ZoomEditor.Value = 1;
+
+        // connections
+        shaderNode.UniformsConnection = new UniformCollectionConnection(uniformsNode, shaderNode, "Uniforms");
+        var itimeConn = new GenericPropertyConnection(timelineNode, uniformsNode, "iTime", "FrameTime");
+        uniformsNode.AddConnectionForCollection("iTime", itimeConn);
+        meshNode.ShapeConnection = new ShapeConnection(rectNode, meshNode, nameof(RenderableNode.Shape));
+        meshNode.TransformConnection = new Transform2DConnection(transformNode, meshNode, nameof(RenderableNode.Transform));
+        meshNode.MaterialConnection = new MaterialConnection(shaderNode, meshNode, nameof(RenderableNode.Material));
+        renderer.CameraConnection = new Camera2DConnection(cameraNode, renderer, nameof(RasterizerNode.Camera));
+        var meshToRenderer = new GenericConnection(meshNode, renderer);
+
+        rv.Nodes.AddRange([timelineNode, uniformsNode, rectNode, transformNode, shaderNode, cameraNode, meshNode, renderer]);
+        rv.Connections.AddRange([
+            shaderNode.UniformsConnection,
+            itimeConn,
+            meshNode.ShapeConnection,
+            meshNode.TransformConnection,
+            meshNode.MaterialConnection,
+            meshToRenderer,
+            renderer.CameraConnection
+            ]);
+
+        rv.SelectedNodeId = 7;
+        return rv;
     }
 }

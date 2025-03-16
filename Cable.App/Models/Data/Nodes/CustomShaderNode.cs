@@ -3,7 +3,7 @@ using Cable.App.Models.Data.Connections;
 using Cable.App.ViewModels.Data.PropertyEditors;
 using Cable.Data;
 using Cable.Data.Types.MaterialData;
-using Cable.Data.Types.Shaders;
+using Cable.Data.Types.Shaders.Special;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Reflection.Metadata;

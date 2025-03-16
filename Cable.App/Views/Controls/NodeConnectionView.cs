@@ -42,6 +42,8 @@ public class NodeConnectionView : Control
         _source = _nodeViewResolver.GetViewFromViewModel(connVm.SourceNode) ?? throw new InvalidOperationException("Source node must not be null");
         _destination = _nodeViewResolver.GetViewFromViewModel(connVm.TargetNode);
         _connection = connVm.Connection;
+
+        AttachHandlers();
     }
 
     public NodeConnectionView(NodeView source, NodeView? dest, IConnection? connection)
@@ -52,6 +54,11 @@ public class NodeConnectionView : Control
 
         _connectionViewModel = new ConnectionViewModel(source.ViewModel, dest?.ViewModel, connection);
 
+        AttachHandlers();
+    }
+
+    private void AttachHandlers()
+    {
         Source.ViewModel.PropertyChanged += ViewModel_PropertyChanged;
         if (Destination != null)
             Destination.ViewModel.PropertyChanged += ViewModel_PropertyChanged;
@@ -98,7 +105,7 @@ public class NodeConnectionView : Control
         }
         else
         {
-            if (_connection == null)
+            if (_connection == null || _connection is GenericConnection)
             {
                 destOffset.X = Destination.ViewModel.X + (Destination.PART_HeaderInput!.ActualWidth / 2);
                 destOffset.Y = Destination.ViewModel.Y + (Destination.PART_HeaderInput!.ActualHeight / 2);

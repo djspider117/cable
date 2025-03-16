@@ -4,8 +4,10 @@ using Cable.App.ViewModels.Data;
 using Cable.App.ViewModels.Data.PropertyEditors;
 using Cable.Core;
 using CommunityToolkit.Mvvm.Messaging;
+using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using Wpf.Ui.Controls;
 
 namespace Cable.App.Views.Controls;
@@ -13,7 +15,7 @@ namespace Cable.App.Views.Controls;
 public class NodeView : Control, ILayoutable
 {
     public static readonly DependencyProperty ViewModelProperty =
-        DependencyProperty.Register(nameof(ViewModel), typeof(NodeViewModel), typeof(NodeView), new PropertyMetadata(null));
+        DependencyProperty.Register(nameof(ViewModel), typeof(NodeViewModel), typeof(NodeView), new PropertyMetadata(null, (s, e) => (s as NodeView)!.OnViewModelChanged(e)));
 
     private static int _zIndex = 0;
     private bool _isDragging;
@@ -45,6 +47,30 @@ public class NodeView : Control, ILayoutable
     static NodeView()
     {
         DefaultStyleKeyProperty.OverrideMetadata(typeof(NodeView), new FrameworkPropertyMetadata(typeof(NodeView)));
+    }
+
+    private void OnViewModelChanged(DependencyPropertyChangedEventArgs e)
+    {
+        var vm = e.NewValue as NodeViewModel;
+        vm!.PropertyChanged += ViewModel_PropertyChanged;
+    }
+
+    private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        var vm = sender as NodeViewModel;
+        if (e.PropertyName == nameof(NodeViewModel.IsSelected))
+        {
+            if (vm!.IsSelected)
+            {
+                BorderThickness = new Thickness(2);
+                BorderBrush = new SolidColorBrush(Colors.Orange);
+            }
+            else
+            {
+                BorderThickness = new Thickness(0);
+                BorderBrush = null;
+            }
+        }
     }
 
     public override void OnApplyTemplate()
