@@ -13,6 +13,8 @@ public enum CableDataType
     Renderable,
     Camera2D,
     Material,
+    Uniforms,
+    ShaderBuilder,
     Timeline,
     RenderCommandList,
     Any,

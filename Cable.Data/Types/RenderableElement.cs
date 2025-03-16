@@ -1,4 +1,6 @@
-﻿namespace Cable.Data.Types;
+﻿using Cable.Data.Types.MaterialData;
+
+namespace Cable.Data.Types;
 
 public readonly record struct RenderableElement(IShape? Shape, IMaterial? Material, Transform Transform) : ICableDataType;
 

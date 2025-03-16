@@ -1,9 +1,12 @@
 ﻿using Cable.App.ViewModels.Data;
 using Cable.Data.Types;
+using Cable.Data.Types.MaterialData;
 using System.Numerics;
 
 namespace Cable.App.Models.Data.Connections;
 
+public partial class UniformCollectionConnection(INodeData source, INodeData target, string? propName = null) : DataConnection<UniformsData>(source, target, propName) { }
+public partial class UniformValueConnection(INodeData source, INodeData target, string? propName = null) : DataConnection<Uniform>(source, target, propName) { }
 public partial class FloatConnection(INodeData source, INodeData target, string? propName = null) : DataConnection<float>(source, target, propName) { }
 public partial class Float2Connection(INodeData source, INodeData target, string? propName = null) : DataConnection<Vector2>(source, target, propName) { }
 public partial class Float3Connection(INodeData source, INodeData target, string? propName = null) : DataConnection<Vector3>(source, target, propName) { }
@@ -19,4 +22,9 @@ public partial class UIntToFloatConnection(INodeData source, INodeData target, s
     : DataConnection<float>(source, target, propName, sourceName)
 {
     public override float ConvertValue(object value) => Convert.ToSingle(value);
+}
+
+public partial class GenericPropertyConnection(INodeData source, INodeData target, string? propName = null, string? sourceName = null)
+    : DataConnection<object>(source, target, propName, sourceName)
+{
 }

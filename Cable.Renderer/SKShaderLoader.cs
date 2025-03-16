@@ -13,6 +13,5 @@ public class SKShaderLoader(SKShaderCompiler compiler)
         _compiler.CompileShader(@"Shaders\AnimatedColors.glsl");
         _compiler.CompileShader(@"Shaders\BigBang.glsl");
         _compiler.CompileShader(@"Shaders\FractalPyramid.glsl");
-        _compiler.CompileShader(@"Shaders\FractalTunnel.glsl");
     }
 }

@@ -16,7 +16,7 @@ public class CableTimeline : IPlayable, ICableDataType
 
     public uint FrameIndex { get; set; }
     public uint FrameRate { get; set; } = 60;
-    public double SecondsFromStart => (double)FrameIndex / FrameRate;
+    public float SecondsFromStart => (float)FrameIndex / FrameRate;
 
     public CableTimeline(bool autostart = true)
     {
@@ -29,7 +29,7 @@ public class CableTimeline : IPlayable, ICableDataType
 
     private void Timer_Tick(object? sender, EventArgs e)
     {
-        FrameIndex = (FrameIndex + 1 ) % 500; //TODO: temp for testing
+        FrameIndex++;
     }
 
     public void Start()

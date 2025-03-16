@@ -1,13 +1,13 @@
 ﻿using System.Numerics;
 
-namespace Cable.Data.Types;
+namespace Cable.Data.Types.MaterialData;
 
 public readonly struct GradientMaterialData(
     Vector4 color1,
-    Vector4 color2, 
-    GradientMaterialData.GradientMaterialType type, 
-    GradientMaterialData.GradientRenderMode 
-    renderMode, 
+    Vector4 color2,
+    GradientMaterialData.GradientMaterialType type,
+    GradientMaterialData.GradientRenderMode
+    renderMode,
     short steps,
     MaterialOptions materialOptions = default)
     : IMaterial

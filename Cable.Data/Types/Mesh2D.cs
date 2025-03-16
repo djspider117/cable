@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using Cable.Data.Types.MaterialData;
+using System.Numerics;
 
 namespace Cable.Data.Types;
 

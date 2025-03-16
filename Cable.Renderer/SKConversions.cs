@@ -1,4 +1,5 @@
 ﻿using Cable.Data.Types;
+using Cable.Data.Types.MaterialData;
 using SkiaSharp;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -40,4 +41,15 @@ public static class SKConversions
     }
 
     public static SKPoint ToSKPoint(this Vector2 point) => new(point.X, point.Y);
+
+    public static SKRuntimeEffectUniform MakeUniformValue(this Uniform uniform)
+    {
+        if (uniform.Value is Vector2 v2)
+            return v2.ToSKPoint();
+
+        if (uniform.Value is float f)
+            return f;
+
+        return default;
+    }
 }

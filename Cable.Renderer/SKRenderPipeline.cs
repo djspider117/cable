@@ -13,7 +13,7 @@ public sealed partial class SKRenderPipeline : IDisposable
         ShaderCache = new SKShaderCache();
         Compiler = new SKShaderCompiler(ShaderCache);
         ShaderLoader = new SKShaderLoader(Compiler);
-        PaintProvider = new SKPaintProvider(ShaderCache);
+        PaintProvider = new SKPaintProvider(ShaderCache, Compiler);
         Renderer = new SKRenderer(this);
     }
 

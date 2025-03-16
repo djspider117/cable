@@ -34,6 +34,16 @@
                     <TextBlock Text="Toggle Node Editor" Margin="10,0,0,0"/>
                 </StackPanel>
             </ToggleButton>
+
+            <Rectangle Fill="#22FFFFFF" VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="2" Margin="5,0"/>
+
+            <Button x:Name="btnPerformLayout" Background="Transparent" Margin="5,0,0,0"
+                    Click="btnPerformLayout_Click">
+                <StackPanel Orientation="Horizontal">
+                    <ui:SymbolIcon Symbol="Grid20" />
+                    <TextBlock Text="Auto Layout" Margin="10,0,0,0"/>
+                </StackPanel>
+            </Button>
         </StackPanel>
 
         <Canvas x:Name="pnlNodeContainer" Background="#55000000" Grid.Row="1"

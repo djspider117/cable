@@ -44,7 +44,7 @@ public partial class GraphEditor : UserControl, INodeViewResolver
     {
         InitializeComponent();
 
-        BuildDemoGraph2();
+        BuildDemoGraph4();
 
         WeakReferenceMessenger.Default.Register<StartNodeConnectionMessage>(this, OnStartNodeConnectionMessage);
         Application.Current.MainWindow.MouseUp += MainWindow_MouseUp;
@@ -182,6 +182,85 @@ public partial class GraphEditor : UserControl, INodeViewResolver
         pnlConnectionsContainer.Children.Add(new NodeConnectionView(v1, v2, c1));
     }
 
+
+    private void BuildDemoGraph4()
+    {
+        var scene = App.GetService<CableSceneViewModel>()!;
+
+        var timelineNode = new TimelineNode(scene.Timeline);
+        var uniformsNode = new UniformsNode(new()
+        {
+            { "iTime", 0f },
+            { "iResolution", new Vector2(1280, 720) }
+        });
+
+        var rectNode = new RectangleNode();
+        var transformNode = new Transform2DNode();
+        var shaderNode = new CustomShaderNode();
+
+        rectNode.WidthEditor.Value = 1280;
+        rectNode.HeightEditor.Value = 720;
+
+        shaderNode.SetShaderFile(new Data.Types.Shaders.FileData(@"Shaders\Tunnel.glsl"));
+        shaderNode.UniformsConnection = new UniformCollectionConnection(uniformsNode, shaderNode, "Uniforms");
+
+        uniformsNode.AddConnectionForCollection("iTime", new GenericPropertyConnection(timelineNode, uniformsNode, "iTime", "FrameTime"));
+
+        transformNode.ScaleEditor.ValueX = 1;
+        transformNode.ScaleEditor.ValueY = 1;
+        transformNode.RotationEditor.Value = 0;
+        transformNode.TranslationEditor.ValueX = 0;
+        transformNode.TranslationEditor.ValueY = 0;
+
+
+
+
+        var meshNode = new RenderableNode();
+        meshNode.ShapeConnection = new ShapeConnection(rectNode, meshNode, nameof(RenderableNode.Shape));
+        meshNode.TransformConnection = new Transform2DConnection(transformNode, meshNode, nameof(RenderableNode.Transform));
+        meshNode.MaterialConnection = new MaterialConnection(shaderNode, meshNode, nameof(RenderableNode.Material));
+
+        var cameraNode = new Camera2DNode();
+        cameraNode.ZoomEditor.Value = 1;
+
+        var renderer = new RasterizerNode { IncomingData = meshNode };
+        renderer.CameraConnection = new Camera2DConnection(cameraNode, renderer, nameof(RasterizerNode.Camera));
+
+        // views
+
+        var q0 = new NodeView() { ViewModel = new NodeViewModel(timelineNode) };
+        var v0 = new NodeView() { ViewModel = new NodeViewModel(uniformsNode) };
+        var v1 = new NodeView() { ViewModel = new NodeViewModel(rectNode) };
+        var v2 = new NodeView() { ViewModel = new NodeViewModel(transformNode) };
+        var v3 = new NodeView() { ViewModel = new NodeViewModel(shaderNode) };
+        var v4 = new NodeView() { ViewModel = new NodeViewModel(meshNode) };
+        var v5 = new NodeView() { ViewModel = new NodeViewModel(cameraNode) };
+        var v6 = new NodeView() { ViewModel = new NodeViewModel(renderer) };
+
+        pnlNodeContainer.Children.Add(q0);
+        pnlNodeContainer.Children.Add(v0);
+        pnlNodeContainer.Children.Add(v1);
+        pnlNodeContainer.Children.Add(v2);
+        pnlNodeContainer.Children.Add(v3);
+        pnlNodeContainer.Children.Add(v4);
+        pnlNodeContainer.Children.Add(v5);
+        pnlNodeContainer.Children.Add(v6);
+
+
+        pnlConnectionsContainer.Children.Add(new NodeConnectionView(q0, v0, timelineNode.FrameTimeConnection));
+        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v0, v3, shaderNode.UniformsConnection));
+        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v1, v4, meshNode.ShapeConnection));
+        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v2, v4, meshNode.TransformConnection));
+        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v3, v4, meshNode.MaterialConnection));
+
+        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v4, v6, null));
+        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v5, v6, renderer.CameraConnection));
+        pnlConnectionsContainer.Children.Add(new NodeConnectionView(v5, v6, renderer.CameraConnection));
+
+        SelectedNodeView = v6;
+        monitor.NodeToPreview = v6;
+    }
+
     private void MainWindow_MouseUp(object sender, MouseButtonEventArgs e)
     {
         if (e.OriginalSource is FrameworkElement fe && fe.Parent is DataConnector dc)
@@ -276,5 +355,10 @@ public partial class GraphEditor : UserControl, INodeViewResolver
         // the node with the least outputs is going to be our root
         var root = nodes.OrderBy(x => x.Children.Count).FirstOrDefault();
         return new Graph<NodeView> { Root = root };
+    }
+
+    private void btnPerformLayout_Click(object sender, RoutedEventArgs e)
+    {
+        PerformAutoLayout();
     }
 }

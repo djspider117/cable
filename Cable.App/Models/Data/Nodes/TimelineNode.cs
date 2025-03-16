@@ -9,9 +9,13 @@ public partial class TimelineNode : NodeDataBase
 {
     private readonly CableTimeline _timeline;
     private IConnection<uint>? _frameIndexConnection;
+    private IConnection<float>? _frameTimeConnection;
 
     public uint FrameIndex => _timeline.FrameIndex;
+    public float FrameTime => _timeline.SecondsFromStart;
+
     private FloatOutputEditor? _frameIndexEditor;
+    private FloatOutputEditor? _frameTimeEditor;
 
     public IConnection<uint>? FrameIndexConnection
     {
@@ -26,6 +30,20 @@ public partial class TimelineNode : NodeDataBase
             }
         }
     }
+    public IConnection<float>? FrameTimeConnection
+    {
+        get => _frameTimeConnection;
+        set
+        {
+            _frameTimeConnection = value;
+            if (_frameTimeConnection != null)
+            {
+                _frameTimeConnection.PropertyChanged += FrameTimeConnection_PropertyChanged;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public FloatOutputEditor FrameIndexEditor
     {
         get
@@ -35,7 +53,20 @@ public partial class TimelineNode : NodeDataBase
             return _frameIndexEditor;
         }
     }
+    public FloatOutputEditor FrameTimeEditor
+    {
+        get
+        {
+            if (_frameTimeEditor == null)
+                _frameTimeEditor = new FloatOutputEditor(this, "FrameTime", () => _timeline.FrameIndex);
+            return _frameTimeEditor;
+        }
+    }
 
+    private void FrameTimeConnection_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        OnPropertyChanged(nameof(FrameTime));
+    }
     private void FrameIndexConnection_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         OnPropertyChanged(nameof(FrameIndex));
@@ -44,7 +75,7 @@ public partial class TimelineNode : NodeDataBase
 
     public override IEnumerable<IPropertyEditor> GetPropertyEditors()
     {
-        return [FrameIndexEditor];
+        return [FrameIndexEditor, FrameTimeEditor];
     }
 
     public TimelineNode(CableTimeline timeline) : base("Timeline", (Cable.Data.CableDataType)0, (Cable.Data.CableDataType)11)
@@ -61,6 +92,9 @@ public partial class TimelineNode : NodeDataBase
     {
         if (propertyName == nameof(FrameIndex))
             return FrameIndex;
+
+        if (propertyName == nameof(FrameTime))
+            return FrameTime;
 
         return null;
     }

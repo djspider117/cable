@@ -1,4 +1,4 @@
-﻿using Cable.Data.Types;
+﻿using Cable.Data.Types.MaterialData;
 using SkiaSharp;
 using System.IO;
 using System.Windows.Media.Effects;
@@ -8,10 +8,12 @@ namespace Cable.Renderer;
 public class SKPaintProvider
 {
     private readonly SKShaderCache _shaderCache;
+    private readonly SKShaderCompiler _compiler;
 
-    public SKPaintProvider(SKShaderCache cache)
+    public SKPaintProvider(SKShaderCache cache, SKShaderCompiler compiler)
     {
         _shaderCache = cache;
+        _compiler = compiler;
     }
 
     public SKPaint CreatePaint(IMaterial? material, float time, float width = 1, float height = 1)
@@ -37,9 +39,37 @@ public class SKPaintProvider
         if (material is NoiseMaterialData noiseData)
             return CreateNoisePaint(time, width, height, noiseData);
 
+        if (material is CustomShaderMaterialData shaderData)
+            return CreateCustomShaderPaint(time, width, height, shaderData);
+
         return new SKPaint() { Color = SKColors.White };
     }
 
+    private SKPaint CreateCustomShaderPaint(float time, float width, float height, CustomShaderMaterialData shaderData)
+    {
+        var effect = _shaderCache.GetEffect(Path.GetFileNameWithoutExtension(shaderData.ShaderPath));
+        if (effect == null)
+        {
+            effect = _compiler.CompileShader(shaderData.ShaderPath);
+
+            if (effect == null)
+                return new();
+        }
+
+        var uniforms = new SKRuntimeEffectUniforms(effect)
+        {
+            { "iTime", time },
+            { "iResolution", new SKSize(width, height) },
+        };
+
+        foreach (var customUniform in shaderData.Uniforms.Values ?? [])
+        {
+            uniforms.Add(customUniform.Name, customUniform.MakeUniformValue());
+        }
+
+        using var shader = effect.ToShader(uniforms);
+        return new SKPaint { Shader = shader };
+    }
     public SKPaint CreateNoisePaint(float time, float width, float height, NoiseMaterialData noiseData)
     {
         var effect = _shaderCache.GetEffect("SimplexNoise");
@@ -146,5 +176,4 @@ public class SKPaintProvider
             StrokeWidth = colorData.MaterialOptions.BorderThickness
         };
     }
-
 }

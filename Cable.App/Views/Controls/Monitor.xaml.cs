@@ -46,6 +46,9 @@ public partial class Monitor : UserControl
         _renderer.SetSize(new System.Numerics.Vector2(1280, 720));
 
         SkiaElement.Renderer = _renderer;
+        SkiaElement.Width = 1280;
+        SkiaElement.Height = 720;
+
         CompositionTarget.Rendering += CompositionTarget_Rendering;
     }
 

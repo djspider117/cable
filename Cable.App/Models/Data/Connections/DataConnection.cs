@@ -29,6 +29,9 @@ public abstract partial class DataConnection<T> : ObservableObject, IConnection<
 
     private void Node_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (e.PropertyName == _sourcePropertyName)
+            return;
+
         OnPropertyChanged("SourceNodeData");
     }
 

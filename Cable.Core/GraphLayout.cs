@@ -29,7 +29,7 @@ public class GraphLayout<T> where T : ILayoutable
         double nextY = 0;
         foreach (var item in node.Parents)
         {
-            item.Data!.Y = nextY;
+            item.Data!.Y = nextY + node.Data.Y;
             nextY += item.Data.ActualHeight + SPACING;
             LayoutInternal(item, visited, depth + 1, offset - node!.Data!.ActualWidth - SPACING);
         }

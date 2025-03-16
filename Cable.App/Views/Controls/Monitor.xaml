@@ -13,7 +13,7 @@
     <Border BorderThickness="1" BorderBrush="#33FFFFFF"
             CornerRadius="12">
 
-        <Grid>
+        <Grid x:Name="MainGrid">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" MinHeight="32"/>
                 <RowDefinition Height="*"/>
@@ -25,10 +25,12 @@
                        TextAlignment="Center" VerticalAlignment="Center"/>
 
             <Rectangle x:Name="rect" Fill="Black" Grid.Row="1"/>
-            <controls:AnimatedRenderViewer x:Name="SkiaElement"
-                                           IgnorePixelScaling="True" 
-                                           Grid.Row="1"/>
-
+            <Viewbox Grid.Row="1" Stretch="UniformToFill" StretchDirection="DownOnly"
+                     Width="{Binding ElementName=MainGrid, Path=ActualWidth}">
+                <controls:AnimatedRenderViewer x:Name="SkiaElement"
+                                               IgnorePixelScaling="True" 
+                                               Grid.Row="1"/>
+            </Viewbox>
 
             <TextBlock Text="Output 1920 x 1080 - 8 Bit Unsigned RGBA (int)" Grid.Row="2"
                        VerticalAlignment="Center" TextAlignment="Center"/>

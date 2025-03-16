@@ -2,7 +2,7 @@
 
 namespace Cable.Data.Types.Shaders;
 
-public class ShaderBuilder
+public class ShaderBuilder : ICableDataType
 {
     public List<UniformDefinition> Uniforms { get; set; } = [];
 
@@ -28,3 +28,5 @@ public class ShaderBuilder
         return sb.ToString();
     }
 }
+
+public readonly record struct FileData(string Path) : ICableDataType;

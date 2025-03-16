@@ -1,4 +1,5 @@
 ﻿using Cable.Data.Types;
+using Cable.Data.Types.MaterialData;
 using System.Numerics;
 
 namespace Cable.Renderer.Tests;

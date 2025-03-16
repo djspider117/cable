@@ -16,6 +16,8 @@ using System.Windows.Shapes;
 using Transform = Cable.Data.Types.Transform;
 using System.IO;
 using System.Windows.Threading;
+using Cable.Data.Types.MaterialData;
+using Cable.Data.Types.Shaders;
 
 namespace Cable.Renderer.Development;
 
@@ -25,6 +27,7 @@ public partial class MainWindow : Window
     private readonly SKRenderer _renderer;
     private double _time;
     private int _index = 0;
+    private VariableNameGenerator _nameGen = new();
 
     public MainWindow()
     {
@@ -85,13 +88,77 @@ public partial class MainWindow : Window
 
     #region Scenes
 
+    public ShaderBuilder CreateShaderBuilder()
+    {
+
+        Vec3Value v3_1 = new Vec3Declaration() { VariableName = _nameGen.CreateVariable(), Value = new Vector3(0, 2, 4) };
+        VectorVariant uv_xyx = new() { Pattern = "xyx", Input = UVValue.Instance };
+        AddOperation add_1 = new() { Operands = [TimeValue.Instance, uv_xyx, v3_1] };
+
+        Vec3Declaration add_declr = new() { VariableName = _nameGen.CreateVariable(), Expression = add_1 };
+
+        FloatValue floatVal = new() { Value = 0.5f };
+        Cos cos = new() { Expression = add_declr };
+
+        MulOperation mul_1 = new() { Operands = [floatVal, cos] };
+        Vec3Declaration mul_declr = new() { VariableName = _nameGen.CreateVariable(), Expression = mul_1 };
+
+        AddOperation add_2 = new() { Operands = [floatVal, mul_declr] };
+
+        Vec3Value v3_2 = new() { Expression = add_2 };
+        Vec3Declaration v3_decl = new() { VariableName = _nameGen.CreateVariable(), Vec3Reference = v3_2 };
+
+        var builder = new ShaderBuilder
+        {
+            Uniforms =
+            [
+                new() { Type = ShaderValueType.Float, Name = "iTime" },
+                new() { Type = ShaderValueType.Vector2, Name = "iResolution" },
+            ],
+            Output = new OutputInstruction() { InputVec3 = v3_decl, OutputAlpha = 0 }
+        };
+
+        return builder;
+    }
+
+    private bool _hasShaderContentChanged = true;
+    private string _customShaderPath = string.Empty;
+
     public RasterizerData BuildShaderScene()
     {
+        // ----------- This section will be handled in the node that returns CustomShaderMaterialData ------------
+
+        if (_hasShaderContentChanged)
+        {
+            var shaderBuilder = CreateShaderBuilder();
+            _customShaderPath = $@"ShaderAutoGen\{Guid.NewGuid()}.glsl";
+            var shaderText = shaderBuilder.BuildShader();
+
+            var dirName = System.IO.Path.GetDirectoryName(_customShaderPath)!;
+            if (!Directory.Exists(dirName))
+                Directory.CreateDirectory(dirName);
+
+            File.WriteAllText(_customShaderPath, shaderText);
+
+            _hasShaderContentChanged = false;
+        }
+
+        //--------------------------------------------------------------------------------------------------------
+
         var renderCol = new RenderableCollection();
 
         var bgRect = new RectangleShape(1280, 720);
 
-        var mat3 = new ScrollingColorsMaterialData();
+        //var mat3 = new CustomShaderMaterialData(
+        //    @"Shaders\SimplexNoise.glsl",
+        //    new()
+        //    {
+        //        { "iOffset", new Vector2((float)(_time / 60f) / 20f, 0) } 
+        //    }
+        // );
+
+        var mat3 = new CustomShaderMaterialData(_customShaderPath, new UniformsData([]));
+
 
         renderCol.Add(new RenderableElement(bgRect, mat3, Transform.Identity));
 
@@ -155,7 +222,7 @@ public partial class MainWindow : Window
         var camera = new Camera2D(usin + 0.0001f, Transform.Identity);
         return new RasterizerData(camera, 1, renderCol, (float)(_time / 60f));
     }
-    
+
     #endregion
 
     private void btnSceneCycle_Click(object sender, RoutedEventArgs e)
