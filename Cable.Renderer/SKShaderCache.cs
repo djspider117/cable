@@ -4,32 +4,27 @@ namespace Cable.Renderer;
 
 public sealed partial class SKShaderCache : IDisposable
 {
-    private readonly Dictionary<string, SKShaderWrapper> _shaderWrappers = [];
+    private readonly Dictionary<string, SKRuntimeEffect> _effects = [];
     private bool _disposed;
 
-    public SKShaderWrapper? Add(string name, SKRuntimeEffect effect, SKRuntimeEffectUniforms uniforms)
+    public void Add(string name, SKRuntimeEffect effect)
     {
         if (_disposed)
-            return null;
+            return;
 
-        var shader = effect.ToShader(uniforms);
-        var wrapper = new SKShaderWrapper(shader, effect, uniforms);
-        _shaderWrappers.Add(name, wrapper);
-
-        return wrapper;
+        _effects.Add(name, effect);
     }
 
-    public SKShaderWrapper? GetWrapper(string name) => _shaderWrappers.ContainsKey(name) ? _shaderWrappers[name] : null;
-    public SKShader? GetShader(string name) => _shaderWrappers.ContainsKey(name) ? _shaderWrappers[name].Shader : null;
+    public SKRuntimeEffect? GetEffect(string name) => _effects.TryGetValue(name, out SKRuntimeEffect? value) ? value : null;
 
     public void Dispose()
     {
         _disposed = true;
-        foreach (var wrapper in _shaderWrappers.Values)
+        foreach (var effect in _effects.Values)
         {
-            wrapper.Dispose();
+            effect.Dispose();
         }
 
-        _shaderWrappers.Clear();
+        _effects.Clear();
     }
 }

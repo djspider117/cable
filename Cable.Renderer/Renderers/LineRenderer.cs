@@ -7,14 +7,14 @@ public class LineRenderer(SKRenderPipeline pipeline)
 {
     private readonly SKRenderPipeline _pipeline = pipeline;
 
-    public void Render(SKCanvas canvas, LineShape shape, IMaterial? material, Transform transform)
+    public void Render(SKRenderContext ctx, LineShape shape, IMaterial? material, Transform transform)
     {
         var sz = shape.End - shape.Start;
 
-        using var paint = _pipeline.PaintProvider.CreatePaint(material, MathF.Abs(sz.X), MathF.Abs(sz.Y));
+        using var paint = _pipeline.PaintProvider.CreatePaint(material, ctx.Time, MathF.Abs(sz.X), MathF.Abs(sz.Y));
         paint.IsStroke = true;
         paint.StrokeWidth = shape.Thickness;
 
-        canvas.DrawLine(shape.Start.ToSKPoint(), shape.End.ToSKPoint(), paint);
+        ctx.Canvas.DrawLine(shape.Start.ToSKPoint(), shape.End.ToSKPoint(), paint);
     }
 }

@@ -5,6 +5,7 @@ using Cable.App.Services;
 using Cable.App.ViewModels.Data;
 using Cable.App.ViewModels.Windows;
 using Cable.App.Views.Windows;
+using Cable.Renderer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,6 +32,10 @@ namespace Cable.App
                 services.AddSingleton<ITaskBarService, TaskBarService>();
 
                 services.AddSingleton<CableSceneViewModel>();
+
+                var pipeline = new SKRenderPipeline();
+                pipeline.Initialize();
+                services.AddSingleton(pipeline);
 
                 // Main window with navigation
                 services.AddSingleton<MainWindow>();

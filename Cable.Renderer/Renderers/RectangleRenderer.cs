@@ -6,20 +6,20 @@ namespace Cable.Renderer.Renderers;
 public class RectangleRenderer(SKRenderPipeline pipeline)
 {
     private readonly SKRenderPipeline _pipeline = pipeline;
-    public void Render(SKCanvas canvas, RectangleShape shape, IMaterial? material, Transform transform)
+    public void Render(SKRenderContext ctx, RectangleShape shape, IMaterial? material, Transform transform)
     {
-        using var paint = _pipeline.PaintProvider.CreatePaint(material, shape.Width, shape.Height);
+        using var paint = _pipeline.PaintProvider.CreatePaint(material, ctx.Time, shape.Width, shape.Height);
         
         var skRect = new SKRect(0, 0, shape.Width, shape.Height);
-        canvas.DrawRect(skRect, paint);
+        ctx.Canvas.DrawRect(skRect, paint);
     }
 
-    public void RenderRounded(SKCanvas canvas, RoundedRectangleShape shape, IMaterial? material, Transform transform)
+    public void RenderRounded(SKRenderContext ctx, RoundedRectangleShape shape, IMaterial? material, Transform transform)
     {
-        using var paint = _pipeline.PaintProvider.CreatePaint(material, shape.Width, shape.Height);
+        using var paint = _pipeline.PaintProvider.CreatePaint(material, ctx.Time, shape.Width, shape.Height);
 
         var skRect = new SKRect(0, 0, shape.Width, shape.Height);
         var roundedRect = new SKRoundRect(skRect, shape.Radius);
-        canvas.DrawRoundRect(roundedRect, paint);
+        ctx.Canvas.DrawRoundRect(roundedRect, paint);
     }
 }

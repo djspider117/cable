@@ -14,7 +14,7 @@ public class SKPaintProvider
         _shaderCache = cache;
     }
 
-    public SKPaint CreatePaint(IMaterial? material, float width = 1, float height = 1)
+    public SKPaint CreatePaint(IMaterial? material, float time, float width = 1, float height = 1)
     {
         if (material is null)
         {
@@ -26,33 +26,46 @@ public class SKPaintProvider
         }
 
         if (material is ColorMaterialData colorData)
-        {
             return CreateSolidColorPaint(colorData);
-        }
 
         if (material is GradientMaterialData gradientData)
-        {
             return CreateGradientPaint(width, height, gradientData);
-        }
+
+        if (material is ScrollingColorsMaterialData scrollingColors)
+            return CreateScrollingColorsPaint(time, width, height, scrollingColors);
 
         if (material is NoiseMaterialData noiseData)
-        {
-            return CreateNoisePaint(width, height, noiseData);
-        }
+            return CreateNoisePaint(time, width, height, noiseData);
 
         return new SKPaint() { Color = SKColors.White };
     }
 
-    private SKPaint CreateNoisePaint(float width, float height, NoiseMaterialData noiseData)
+    public SKPaint CreateNoisePaint(float time, float width, float height, NoiseMaterialData noiseData)
     {
-        var wrapper = _shaderCache.GetWrapper("AnimatedColors");
-        if (wrapper == null)
+        var effect = _shaderCache.GetEffect("PerlinNoise");
+        if (effect == null)
             return new();
 
-        var effect = wrapper.Value.Effect;
-        var uniforms = new SKRuntimeEffectUniforms(effect);
-        uniforms.Add("iTime", 0f);
-        uniforms.Add("iResolution", new SKSize(width, height));
+        var uniforms = new SKRuntimeEffectUniforms(effect)
+        {
+            { "iTime", time },
+            { "iResolution", new SKSize(width, height) }
+        };
+
+        using var shader = effect.ToShader(uniforms);
+        return new SKPaint { Shader = shader };
+    }
+    public SKPaint CreateScrollingColorsPaint(float time, float width, float height, ScrollingColorsMaterialData data)
+    {
+        var effect = _shaderCache.GetEffect("AnimatedColors");
+        if (effect == null)
+            return new();
+
+        var uniforms = new SKRuntimeEffectUniforms(effect)
+        {
+            { "iTime", time },
+            { "iResolution", new SKSize(width, height) }
+        };
 
         using var shader = effect.ToShader(uniforms);
         return new SKPaint { Shader = shader };
@@ -132,4 +145,5 @@ public class SKPaintProvider
             StrokeWidth = colorData.MaterialOptions.BorderThickness
         };
     }
+
 }

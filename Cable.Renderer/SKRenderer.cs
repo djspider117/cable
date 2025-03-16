@@ -11,7 +11,7 @@ public class SKRenderer
 {
     public event EventHandler<Vector2?>? DesiredSizeChanged;
 
-    private readonly RendererProvider rendererProvider;
+    private readonly SKRenderDispatcher rendererDispatcher;
     private readonly ConcurrentQueue<RasterizerData> _renderQueue = new();
     private readonly SKRenderPipeline _pipeline;
 
@@ -42,7 +42,7 @@ public class SKRenderer
     internal SKRenderer(SKRenderPipeline pipeline)
     {
         _pipeline = pipeline;
-        rendererProvider = new RendererProvider(pipeline);
+        rendererDispatcher = new SKRenderDispatcher(pipeline);
     }
 
     public void PushFrame(RasterizerData rasterizerData)
@@ -77,44 +77,45 @@ public class SKRenderer
         //_aa = renderData.AA;
         _camera = renderData.Camera;
 
+        var rcontext = new SKRenderContext(canvas, renderData.Time);
+        
         canvas.Clear(SKColors.Black);
         var updatedTransform = new Transform(_camera.Transform.Translate, _camera.Transform.Rotation, _camera.Transform.Scale * _camera.Zoom, _camera.Transform.OriginOffset);
-        ApplyTransform(canvas, updatedTransform, (_currentFrameInfo?.Width ?? 0) / 2, (_currentFrameInfo?.Height ?? 0) / 2);
+        ApplyTransform(rcontext, updatedTransform, (_currentFrameInfo?.Width ?? 0) / 2, (_currentFrameInfo?.Height ?? 0) / 2);
 
         foreach (var element in renderData.Elements)
         {
-            Render(canvas, element);
+            Render(rcontext, element);
         }
     }
-    private void Render(SKCanvas canvas, RenderableElement elem)
+    private void Render(SKRenderContext context, RenderableElement elem)
     {
         if (elem.Shape is ShapeCollection col)
         {
             foreach (var shape in col)
             {
-                Render(canvas, shape, elem.Material, elem.Transform);
+                Render(context, shape, elem.Material, elem.Transform);
             }
         }
         else if (elem.Shape != null)
         {
-            Render(canvas, elem.Shape, elem.Material, elem.Transform);
+            Render(context, elem.Shape, elem.Material, elem.Transform);
         }
     }
-    private void Render(SKCanvas canvas, IShape shape, IMaterial? material, Transform transform)
+    private void Render(SKRenderContext context, IShape shape, IMaterial? material, Transform transform)
     {
-        canvas.Save();
-        ApplyTransform(canvas, transform);
+        context.Canvas.Save();
+        ApplyTransform(context, transform);
 
-        var renderingFunction = rendererProvider.GetRenderFunction(shape);
-        renderingFunction(canvas, shape, material, transform);
-
-        canvas.Restore();
+        rendererDispatcher.Render(context, shape, material, transform);
+        
+        context.Canvas.Restore();
     }
 
-    private void ApplyTransform(SKCanvas canvas, Transform transform, float cx = 0, float cy = 0)
+    private void ApplyTransform(SKRenderContext context, Transform transform, float cx = 0, float cy = 0)
     {
-        canvas.Translate(transform.Translate.X, transform.Translate.Y);
-        canvas.RotateDegrees(transform.Rotation);
-        canvas.Scale(transform.Scale.X, transform.Scale.Y, cx, cy);
+        context.Canvas.Translate(transform.Translate.X, transform.Translate.Y);
+        context.Canvas.RotateDegrees(transform.Rotation);
+        context.Canvas.Scale(transform.Scale.X, transform.Scale.Y, cx, cy);
     }
 }

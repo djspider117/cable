@@ -40,7 +40,9 @@ public partial class Monitor : UserControl
     {
         InitializeComponent();
 
-        _renderer = new SKRenderer();
+        var pipeline = App.GetService<SKRenderPipeline>()!;
+
+        _renderer = pipeline.Renderer;
         _renderer.SetSize(new System.Numerics.Vector2(1280, 720));
 
         SkiaElement.Renderer = _renderer;

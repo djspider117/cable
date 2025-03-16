@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Transform = Cable.Data.Types.Transform;
 using System.IO;
+using System.Windows.Threading;
 
 namespace Cable.Renderer.Development;
 
@@ -23,7 +24,7 @@ public partial class MainWindow : Window
     private SKRenderPipeline _pipeline;
     private readonly SKRenderer _renderer;
     private double _time;
-    private int _index;
+    private int _index = 1;
 
     public MainWindow()
     {
@@ -31,51 +32,26 @@ public partial class MainWindow : Window
         _pipeline.Initialize();
 
         InitializeComponent();
-        Unloaded += MainWindow_Unloaded;
 
         _renderer = _pipeline.Renderer;
         _renderer.SetSize(new Vector2(1280, 720));
 
         SkiaElement.Renderer = _renderer;
-        //Render();
 
-        //CompositionTarget.Rendering += CompositionTarget_Rendering;
-        new Thread(() =>
-        {
-            while (true)
-            {
-                _time++;
-                Render();
-                Thread.Sleep(16);
-            }
-        }).Start();
+        CompositionTarget.Rendering += CompositionTarget_Rendering;
     }
 
-    private void MainWindow_Unloaded(object sender, RoutedEventArgs e)
+    protected override void OnClosed(EventArgs e)
     {
-        Unloaded -= MainWindow_Unloaded;
+        base.OnClosed(e);
         _pipeline.Dispose();
-    }
-
-    private void BuildReferenceImage()
-    {
-        var info = new SKImageInfo(1280, 720, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
-        using var surface = SKSurface.Create(info);
-
-        _renderer.SetCurrentFrameInfo(info);
-        _renderer.SetCurrentSurface(surface);
-        _renderer.Render(surface.Canvas);
-
-        using var snapshot = surface.Snapshot();
-        using var data = snapshot.Encode(SKEncodedImageFormat.Png, 100);
-        using var stream = File.OpenWrite("reference.png");
-        data.SaveTo(stream);
     }
 
     private void CompositionTarget_Rendering(object? sender, EventArgs e)
     {
         _time++;
         Render();
+        SkiaElement.InvalidateVisual();
     }
 
     private void Render()
@@ -92,6 +68,22 @@ public partial class MainWindow : Window
         if (_index == 3)
             _renderer.PushFrame(StaticSceneBuilder.BuildScene());
     }
+    private void BuildReferenceImage()
+    {
+        var info = new SKImageInfo(1280, 720, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
+        using var surface = SKSurface.Create(info);
+
+        _renderer.SetCurrentFrameInfo(info);
+        _renderer.SetCurrentSurface(surface);
+        _renderer.Render(surface.Canvas);
+
+        using var snapshot = surface.Snapshot();
+        using var data = snapshot.Encode(SKEncodedImageFormat.Png, 100);
+        using var stream = File.OpenWrite("reference.png");
+        data.SaveTo(stream);
+    }
+
+    #region Scenes
 
     public RasterizerData BuildShaderScene()
     {
@@ -99,7 +91,7 @@ public partial class MainWindow : Window
 
         var bgRect = new RectangleShape(1280, 720);
 
-        var mat3 = new NoiseMaterialData();
+        var mat3 = new ScrollingColorsMaterialData();
 
         renderCol.Add(new RenderableElement(bgRect, mat3, Transform.Identity));
 
@@ -136,7 +128,7 @@ public partial class MainWindow : Window
         renderCol.Add(new RenderableElement(rect1, mat1, t1));
 
         var camera = new Camera2D(usin / 2 + 0.5f, Transform.Identity);
-        return new RasterizerData(camera, 1, renderCol);
+        return new RasterizerData(camera, 1, renderCol, (float)(_time / 60f));
     }
 
     public RasterizerData BuildTransformTest()
@@ -161,8 +153,10 @@ public partial class MainWindow : Window
         renderCol.Add(new RenderableElement(rect1, null, t1));
 
         var camera = new Camera2D(usin + 0.0001f, Transform.Identity);
-        return new RasterizerData(camera, 1, renderCol);
+        return new RasterizerData(camera, 1, renderCol, (float)(_time / 60f));
     }
+    
+    #endregion
 
     private void btnSceneCycle_Click(object sender, RoutedEventArgs e)
     {
