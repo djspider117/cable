@@ -39,9 +39,17 @@ public class Vec3Declaration : Vec3Value, IDeclaration
 
     protected override IEnumerable<IDeclaration> GetDeclarations()
     {
-        if (Vec3Reference?.HasDeclarations is true)
+        if (Vec3Reference != null && Vec3Reference.HasDeclarations is true)
         {
             foreach (var decl in Vec3Reference.Declarations)
+            {
+                yield return decl;
+            }
+        }
+
+        if (Expression is not null && Expression.HasDeclarations is true)
+        {
+            foreach (var decl in Expression.Declarations)
             {
                 yield return decl;
             }
@@ -54,6 +62,9 @@ public class Vec3Declaration : Vec3Value, IDeclaration
     {
         if (Vec3Reference != null)
             return [$"vec3 {VariableName} = {Vec3Reference};"];
+
+        if (Expression != null)
+            return [$"vec3 {VariableName} = {Expression};"];
 
         Vec3Reference = new Vec3Value { Value = Value };
         return GetDeclarationTextx();
