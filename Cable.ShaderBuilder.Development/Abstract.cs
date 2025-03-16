@@ -8,13 +8,25 @@ namespace Cable.ShaderBuilder.Development;
 
 public interface IShaderInstruction
 {
+    bool HasDeclarations { get; }
+    IEnumerable<IDeclaration> Declarations { get; }
 }
 public interface IVariable : IShaderInstruction;
 public interface IOperand : IShaderInstruction;
-public interface ITrigFunction : IShaderInstruction;
+public interface ITrigFunction : IShaderInstruction, IOperand;
 public interface IExpression : IShaderInstruction;
 public interface IOutput : IShaderInstruction;
 public interface IDeclaration : IShaderInstruction
 {
-    IReadOnlyList<string> GetDeclarations();
+    IReadOnlyList<string> GetDeclarationTextx();
+}
+
+public abstract class ShaderInstructionBase : IShaderInstruction
+{
+    protected List<IDeclaration> _declarations = [];
+
+    public virtual bool HasDeclarations { get; }
+    public IEnumerable<IDeclaration> Declarations => GetDeclarations();
+
+    protected virtual IEnumerable<IDeclaration> GetDeclarations() => _declarations;
 }

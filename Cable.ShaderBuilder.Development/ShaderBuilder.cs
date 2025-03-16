@@ -18,10 +18,11 @@ public class ShaderBuilder
         }
         sb.AppendLine();
 
-        sb.AppendLine("vec4 main(vec2 fragCoord)");
-        sb.AppendLine("{");
-        sb.AppendLine("\tvec2 uv = fragCoord/iResolution.xy;");
-        sb.AppendLine($"\t{Output}");
+        sb.AppendLine("vec4 main(vec2 fragCoord){");
+        sb.AppendLine();
+        sb.AppendLine("vec2 uv = fragCoord/iResolution.xy;");
+        sb.AppendLine($"{Output}");
+        sb.AppendLine();
         sb.AppendLine("}");
 
         return sb.ToString();

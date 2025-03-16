@@ -1,6 +1,6 @@
 ﻿namespace Cable.ShaderBuilder.Development;
 
-public class FloatValue : IOperand, IExpression
+public class FloatValue : ShaderInstructionBase, IOperand, IExpression
 {
     public float Value { get; set; }
 

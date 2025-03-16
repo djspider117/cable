@@ -7,14 +7,14 @@ public class Program
 {
     static void Main(string[] args)
     {
-        Vec3Value v3_1 = new Vec3Value() {/* VariableName = "q1",*/ Value = new Vector3(0, 2, 4) };
+        Vec3Value v3_1 = new Vec3Declaration() { VariableName = "q1", Value = new Vector3(0, 2, 4) };
         VectorVariant uv_xyx = new() { Pattern = "xyx", Input = UVValue.Instance };
         AddOperation add_1 = new() { Operands = [TimeValue.Instance, uv_xyx, v3_1] };
 
         FloatValue floatVal = new() { Value = 0.5f };
         Cos cos = new() { Expression = add_1 };
 
-        MulOperation mul_1 = new() { Operands = [floatVal, add_1] };
+        MulOperation mul_1 = new() { Operands = [floatVal, cos] };
         AddOperation add_2 = new() { Operands = [floatVal, mul_1] };
 
         Vec3Value v3_2 = new() { Expression = add_2 };

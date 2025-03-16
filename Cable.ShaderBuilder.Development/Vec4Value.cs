@@ -1,6 +1,6 @@
 ﻿namespace Cable.ShaderBuilder.Development;
 
-public class Vec4Value : IVariable, IOperand
+public class Vec4Value : ShaderInstructionBase, IVariable, IOperand
 {
     public Vec3Value? Vec3 { get; set; }
 

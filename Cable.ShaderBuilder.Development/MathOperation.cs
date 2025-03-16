@@ -1,9 +1,17 @@
-﻿namespace Cable.ShaderBuilder.Development;
+﻿
+namespace Cable.ShaderBuilder.Development;
 
-public abstract class MathOperation : IExpression, IOperand
+public abstract class MathOperation : ShaderInstructionBase, IExpression, IOperand
 {
     public List<IOperand> Operands { get; set; } = [];
     public abstract string Operator { get; }
+
+    public override bool HasDeclarations => Operands.Any(x => x.HasDeclarations);
+
+    protected override IEnumerable<IDeclaration> GetDeclarations()
+    {
+        return Operands.Where(x => x.HasDeclarations).SelectMany(x => x.Declarations).Cast<IDeclaration>();
+    }
 
     public override string ToString()
     {

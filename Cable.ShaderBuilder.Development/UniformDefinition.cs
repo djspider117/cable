@@ -8,7 +8,7 @@ public enum ShaderValueType
     Vector4
 }
 
-public class UniformDefinition : IShaderInstruction
+public class UniformDefinition : ShaderInstructionBase, IShaderInstruction
 {
     public ShaderValueType Type { get; set; }
     public string Name { get; set; }

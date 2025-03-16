@@ -1,6 +1,6 @@
 ﻿namespace Cable.ShaderBuilder.Development;
 
-public class TimeValue : IOperand, IExpression, IVariable
+public class TimeValue : ShaderInstructionBase, IOperand, IExpression, IVariable
 {
     public static readonly TimeValue Instance = new();
 
