@@ -22,14 +22,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Shaders\" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <None Update="Shaders\AnimatedColors.glsl">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Shaders\PerlinNoise.glsl">
+	  <None Update="Shaders\BigBang.glsl">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Shaders\FractalPyramid.glsl">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Shaders\CircleSquares.glsl">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Shaders\SimplexNoise.glsl">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	  <None Update="Shaders\Tunnel.glsl">

@@ -24,7 +24,7 @@ public partial class MainWindow : Window
     private SKRenderPipeline _pipeline;
     private readonly SKRenderer _renderer;
     private double _time;
-    private int _index = 1;
+    private int _index = 0;
 
     public MainWindow()
     {

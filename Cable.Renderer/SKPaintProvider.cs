@@ -42,14 +42,15 @@ public class SKPaintProvider
 
     public SKPaint CreateNoisePaint(float time, float width, float height, NoiseMaterialData noiseData)
     {
-        var effect = _shaderCache.GetEffect("PerlinNoise");
+        var effect = _shaderCache.GetEffect("SimplexNoise");
         if (effect == null)
             return new();
 
         var uniforms = new SKRuntimeEffectUniforms(effect)
         {
             { "iTime", time },
-            { "iResolution", new SKSize(width, height) }
+            { "iResolution", new SKSize(width, height) },
+            { "iOffset", new SKPoint(time * 0.2f, time * 0.7f) }
         };
 
         using var shader = effect.ToShader(uniforms);
@@ -63,7 +64,7 @@ public class SKPaintProvider
 
         var uniforms = new SKRuntimeEffectUniforms(effect)
         {
-            { "iTime", time },
+            { "iTime", (float)(time / 10) },
             { "iResolution", new SKSize(width, height) }
         };
 

@@ -1,13 +1,16 @@
-uniform float iTime; // Time for animation
-uniform vec2 iResolution; // Resolution of the canvas
+uniform float iTime;
+uniform vec2 iResolution;
+uniform vec2 iOffset;
 
-// Classic Perlin noise implementation in GLSL
-vec2 hash(vec2 p) {
+// Simplex noise function
+vec2 hash(vec2 p) 
+{
     p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
     return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
 }
 
-float noise(vec2 p) {
+float simplexNoise(vec2 p) 
+{
     const float K1 = 0.366025404; // (sqrt(3)-1)/2
     const float K2 = 0.211324865; // (3-sqrt(3))/6
 
@@ -23,10 +26,29 @@ float noise(vec2 p) {
     return dot(n, vec3(70.0));
 }
 
-vec4 main(vec2 fragCoord) {
+// Fractal Brownian Motion (fBm) using multiple octaves of noise
+float fbm(vec2 p) 
+{
+    float sum = 0.0;
+    float amp = 0.5;
+    float freq = 1.0;
+
+    for (int i = 0; i < 5; i++) 
+    {
+        sum += amp * simplexNoise(p * freq);
+        freq *= 2.0;
+        amp *= 0.5;
+    }
+    return sum;
+}
+
+vec4 main(vec2 fragCoord) 
+{
     vec2 uv = fragCoord / iResolution.xy;
-    uv *= 5.0; // Scale the noise
-    float noiseValue = noise(uv + iTime * 0.1); // Animate noise with time
+    uv *= 6.0; // Increase scale
+
+    float noiseValue = fbm(uv + iOffset); // Animated fractal noise
     vec3 color = vec3(noiseValue * 0.5 + 0.5); // Map noise to grayscale
-    return vec4(color, 1.0); // Output color
+
+    return vec4(color, 1.0);
 }
