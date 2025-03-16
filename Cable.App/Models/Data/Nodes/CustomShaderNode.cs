@@ -20,6 +20,7 @@ public partial class CustomShaderNode : NodeData<IMaterial>
     private string _customShaderPath;
 
     public void SetShaderFile(FileData shaderFile) => _shaderFile = shaderFile;
+    public void SetShaderBuilder(ShaderBuilder builder) => _shaderBuilder = builder;
 
     public override IMaterial? GetTypedOutput()
     {

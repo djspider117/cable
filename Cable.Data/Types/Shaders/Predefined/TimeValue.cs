@@ -1,4 +1,4 @@
-﻿namespace Cable.Data.Types.Shaders;
+﻿namespace Cable.Data.Types.Shaders.Predefined;
 
 public class TimeValue : ShaderInstructionBase, IOperand, IExpression, IVariable
 {

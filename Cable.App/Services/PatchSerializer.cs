@@ -11,6 +11,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Cable.App.Models.Data.Connections;
+using Cable.Data.Types.Shaders.Special;
 
 namespace Cable.App.Services;
 

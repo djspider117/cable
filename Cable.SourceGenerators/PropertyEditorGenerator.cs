@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Differencing;
 using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Immutable;
@@ -71,6 +72,14 @@ public class PropertyEditorGenerator : IIncrementalGenerator
         var classAttributes = classSymbol.GetAttributes();
         var nodeDataAttribute = classAttributes.FirstOrDefault(x => x.AttributeClass?.Name.Contains("NodeData") ?? false)!;
 
+        if (classSymbol.IsGenericType)
+        {
+            var typeArguments = classSymbol.TypeParameters
+                .Select(tp => tp.Name)
+                .ToArray();
+            className = $"{classSymbol.Name}<{string.Join(", ", typeArguments)}>";
+        }
+
         var sb = new StringBuilder();
         sb.AppendLine("using Cable.App.Extensions;");
         sb.AppendLine("using Cable.App.Models.Data;");
@@ -127,10 +136,16 @@ public class PropertyEditorGenerator : IIncrementalGenerator
         sb.AppendLine();
         sb.AppendLine("        public override IEnumerable<IPropertyEditor> GetPropertyEditors()");
         sb.AppendLine("        {");
-
-        foreach (var editor in editors)
+        if (editors.Count == 0)
         {
-            sb.AppendLine($"            yield return {editor};");
+            sb.AppendLine($"            return new List<IPropertyEditor>();");
+        }
+        else
+        {
+            foreach (var editor in editors)
+            {
+                sb.AppendLine($"            yield return {editor};");
+            }
         }
 
         sb.AppendLine("        }");

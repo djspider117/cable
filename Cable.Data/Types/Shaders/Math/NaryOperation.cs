@@ -1,11 +1,13 @@
 ﻿namespace Cable.Data.Types.Shaders.Math;
 
-public abstract class MathOperation : ShaderInstructionBase, IExpression, IOperand
+public abstract class NaryOperation : ShaderInstructionBase, IExpression, IOperand
 {
     public List<IOperand> Operands { get; set; } = [];
-    public abstract string Operator { get; }
+    public string Operator { get; init; }
 
     public override bool HasDeclarations => Operands.Any(x => x.HasDeclarations);
+
+    protected NaryOperation(string op) => Operator = op;
 
     protected override IEnumerable<IDeclaration> GetDeclarations()
     {
@@ -22,7 +24,7 @@ public abstract class MathOperation : ShaderInstructionBase, IExpression, IOpera
 
         return string.Join($" {Operator} ", Operands.Select(x =>
         {
-            if (x is MathOperation)
+            if (x is NaryOperation)
                 return $"({x})";
 
             return x.ToString();
@@ -30,12 +32,8 @@ public abstract class MathOperation : ShaderInstructionBase, IExpression, IOpera
     }
 }
 
-public class AddOperation : MathOperation
-{
-    public override string Operator => "+";
-}
-
-public class MulOperation : MathOperation
-{
-    public override string Operator => "*";
-}
+public class Add() : NaryOperation("+");
+public class Mul() : NaryOperation("*");
+public class Sub() : NaryOperation("-");
+public class Div() : NaryOperation("/");
+public class Mod() : NaryOperation("%");

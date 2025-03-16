@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Cable.Data.Types.Shaders;
 
-public interface IShaderInstruction
+public interface IShaderInstruction : ICableDataType
 {
     bool HasDeclarations { get; }
     IEnumerable<IDeclaration> Declarations { get; }

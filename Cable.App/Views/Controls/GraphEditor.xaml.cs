@@ -1,6 +1,7 @@
 ﻿using Cable.App.Extensions;
 using Cable.App.Models.Data;
 using Cable.App.Models.Data.Connections;
+using Cable.App.Models.Data.Nodes.Shaders;
 using Cable.App.Models.Messages;
 using Cable.App.Services;
 using Cable.App.ViewModels.Data;
@@ -10,6 +11,7 @@ using Cable.Data.Serialization;
 using Cable.Data.Types;
 using Cable.Data.Types.MaterialData;
 using Cable.Data.Types.Shaders;
+using Cable.Data.Types.Shaders.Special;
 using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Collections.Generic;
@@ -253,7 +255,7 @@ public partial class GraphEditor : UserControl, INodeViewResolver
     {
         var rv = new PatchData();
 
-
+        // TODO
 
         return rv;
     }
@@ -362,8 +364,50 @@ public class DemoPatches
         var meshNode = new RenderableNode() { Id = 6 };
         var renderer = new RasterizerNode { IncomingData = meshNode, Id = 7 };
 
+        // shader nodes
+        var v3_1 = new ShaderVec3Node() { Id = 8 };
+        var uv_xyx = new VectorVariantNode() { Id = 9 };
+        var add_1 = new Add3Node() { Id = 10 };
+        var floatVal = new ShaderFloatNode() { Id = 11 };
+        var cos = new CosNode() { Id = 12 };
+        var mul_1 = new Mul2Node() { Id = 13 };
+        var add_2 = new Add2Node() { Id = 14 };
+        var v3_2 = new ShaderVec3Node() { Id = 15 };
+        var outNode = new OutputInstructionNode() { Id = 16 };
+        var shaderBuilder = new ShaderBuilderNode() { Id = 17 };
+
+        var uvNode = new UVNode() { Id = 18 };
+        var timeNode = new TimeNode() { Id = 19 };
+
+
+        // shader defaults
+        v3_1.ValueEditor.ValueX = 0;
+        v3_1.ValueEditor.ValueY = 2;
+        v3_1.ValueEditor.ValueZ = 4;
+        uv_xyx.PatternEditor.Value = "xyx";
+        floatVal.ValueEditor.Value = 0.5f;
+        outNode.OutputAlphaEditor.Value = 0;
+
+        //shader connections
+        uv_xyx.InputConnection = new ShaderVariableConnection(uvNode, uv_xyx, "Input");
+
+        add_1.Input1Connection = new ShaderOperandConnection(timeNode, add_1, "Input1");
+        add_1.Input2Connection = new ShaderOperandConnection(uv_xyx, add_1, "Input2");
+        add_1.Input3Connection = new ShaderOperandConnection(v3_1, add_1, "Input3");
+
+        cos.ExpressionConnection = new ShaderExpressionConnection(add_1, cos, "Expression");
+        mul_1.Input1Connection = new ShaderOperandConnection(floatVal, mul_1, "Input1");
+        mul_1.Input2Connection = new ShaderOperandConnection(cos, mul_1, "Input2");
+
+        add_2.Input1Connection = new ShaderOperandConnection(floatVal, add_2, "Input1");
+        add_2.Input2Connection = new ShaderOperandConnection(mul_1, add_2, "Input2");
+
+        v3_2.ExpressionConnection = new ShaderExpressionConnection(add_2, v3_2, "Expression");
+        outNode.InputVec3Connection = new ShaderVec3Connection(v3_2, outNode, "InputVec3");
+        shaderBuilder.ShaderOutputConnection = new ShaderOutputConnection(outNode, shaderBuilder, "ShaderOutput");
+
         // default values
-        shaderNode.SetShaderFile(new FileData(@"Shaders\FractalPyramid.glsl"));
+        //shaderNode.SetShaderFile(new FileData(@"Shaders\FractalPyramid.glsl"));
         rectNode.WidthEditor.Value = 1280;
         rectNode.HeightEditor.Value = 720;
         transformNode.ScaleEditor.ValueX = 1;
@@ -374,6 +418,8 @@ public class DemoPatches
         cameraNode.ZoomEditor.Value = 1;
 
         // connections
+
+        shaderNode.ShaderBuilderConnection = new ShaderBuilderConnection(shaderBuilder, shaderNode, "ShaderBuilder");
         shaderNode.UniformsConnection = new UniformCollectionConnection(uniformsNode, shaderNode, "Uniforms");
         var itimeConn = new GenericPropertyConnection(timelineNode, uniformsNode, "iTime", "FrameTime");
         uniformsNode.AddConnectionForCollection("iTime", itimeConn);
@@ -384,6 +430,8 @@ public class DemoPatches
         var meshToRenderer = new GenericConnection(meshNode, renderer);
 
         rv.Nodes.AddRange([timelineNode, uniformsNode, rectNode, transformNode, shaderNode, cameraNode, meshNode, renderer]);
+        rv.Nodes.AddRange([v3_1, uv_xyx, add_1, floatVal, cos, mul_1, add_2, v3_2, outNode, shaderBuilder, uvNode, timeNode]);
+
         rv.Connections.AddRange([
             shaderNode.UniformsConnection,
             itimeConn,
@@ -392,7 +440,23 @@ public class DemoPatches
             meshNode.MaterialConnection,
             meshToRenderer,
             renderer.CameraConnection
-            ]);
+        ]);
+
+        rv.Connections.AddRange([
+            uv_xyx.InputConnection,
+            add_1.Input1Connection,
+            add_1.Input2Connection,
+            add_1.Input3Connection,
+            cos.ExpressionConnection,
+            mul_1.Input1Connection,
+            mul_1.Input2Connection,
+            add_2.Input1Connection,
+            add_2.Input2Connection,
+            v3_2.ExpressionConnection,
+            outNode.InputVec3Connection,
+            shaderBuilder.ShaderOutputConnection,
+            shaderNode.ShaderBuilderConnection
+        ]);
 
         rv.SelectedNodeId = 7;
         return rv;

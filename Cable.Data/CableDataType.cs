@@ -15,6 +15,7 @@ public enum CableDataType
     Material,
     Uniforms,
     ShaderBuilder,
+    ShaderInstruction,
     Timeline,
     RenderCommandList,
     Any,

@@ -1,12 +1,15 @@
 ﻿using Cable.App.ViewModels.Data;
 using Cable.Data.Types;
 using Cable.Data.Types.MaterialData;
+using Cable.Data.Types.Shaders;
+using Cable.Data.Types.Shaders.Special;
 using System.Numerics;
 
 namespace Cable.App.Models.Data.Connections;
 
 public partial class UniformCollectionConnection(INodeData source, INodeData target, string? propName = null) : DataConnection<UniformsData>(source, target, propName) { }
 public partial class UniformValueConnection(INodeData source, INodeData target, string? propName = null) : DataConnection<Uniform>(source, target, propName) { }
+public partial class StringConnection(INodeData source, INodeData target, string? propName = null) : DataConnection<string>(source, target, propName) { }
 public partial class FloatConnection(INodeData source, INodeData target, string? propName = null) : DataConnection<float>(source, target, propName) { }
 public partial class Float2Connection(INodeData source, INodeData target, string? propName = null) : DataConnection<Vector2>(source, target, propName) { }
 public partial class Float3Connection(INodeData source, INodeData target, string? propName = null) : DataConnection<Vector3>(source, target, propName) { }
@@ -33,3 +36,11 @@ public partial class GenericConnection(INodeData source, INodeData target)
     : DataConnection<object>(source, target, null, null)
 {
 }
+
+public partial class ShaderInstructionConnection(INodeData source, INodeData target, string? propName = null) : DataConnection<IShaderInstruction>(source, target, propName) { }
+public partial class ShaderVariableConnection(INodeData source, INodeData target, string? propName = null) : DataConnection<IVariable>(source, target, propName) { }
+public partial class ShaderOperandConnection(INodeData source, INodeData target, string? propName = null) : DataConnection<IOperand>(source, target, propName) { }
+public partial class ShaderExpressionConnection(INodeData source, INodeData target, string? propName = null) : DataConnection<IExpression>(source, target, propName) { }
+public partial class ShaderVec3Connection(INodeData source, INodeData target, string? propName = null) : DataConnection<Vec3Value>(source, target, propName) { }
+public partial class ShaderOutputConnection(INodeData source, INodeData target, string? propName = null) : DataConnection<OutputInstruction>(source, target, propName) { }
+public partial class ShaderBuilderConnection(INodeData source, INodeData target, string? propName = null) : DataConnection<ShaderBuilder>(source, target, propName) { }

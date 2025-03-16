@@ -5,6 +5,7 @@ using Cable.App.Services;
 using Cable.App.ViewModels.Data;
 using Cable.App.ViewModels.Windows;
 using Cable.App.Views.Windows;
+using Cable.Data.Types.Shaders.Special;
 using Cable.Renderer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,6 +37,8 @@ namespace Cable.App
                 var pipeline = new SKRenderPipeline();
                 pipeline.Initialize();
                 services.AddSingleton(pipeline);
+
+                services.AddSingleton<VariableNameGenerator>();
 
                 // Main window with navigation
                 services.AddSingleton<MainWindow>();

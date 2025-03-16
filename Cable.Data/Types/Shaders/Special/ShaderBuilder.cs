@@ -6,7 +6,7 @@ public class ShaderBuilder : ICableDataType
 {
     public List<UniformDefinition> Uniforms { get; set; } = [];
 
-    public IOutput Output { get; set; }
+    public IOutput? Output { get; set; }
 
     public string BuildShader()
     {
@@ -21,7 +21,8 @@ public class ShaderBuilder : ICableDataType
         sb.AppendLine("vec4 main(vec2 fragCoord){");
         sb.AppendLine();
         sb.AppendLine("vec2 uv = fragCoord/iResolution.xy;");
-        sb.AppendLine($"{Output}");
+        if (Output != null)
+            sb.AppendLine($"{Output}");
         sb.AppendLine();
         sb.AppendLine("}");
 
