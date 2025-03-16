@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Cable.ShaderBuilder.Development;
+namespace Cable.Data.Types.Shaders;
 
 public class ShaderBuilder
 {

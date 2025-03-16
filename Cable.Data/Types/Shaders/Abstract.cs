@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Cable.ShaderBuilder.Development;
+namespace Cable.Data.Types.Shaders;
 
 public interface IShaderInstruction
 {

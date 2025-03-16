@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace Cable.ShaderBuilder.Development;
+namespace Cable.Data.Types.Shaders;
 
 public class Vec3Value : ShaderInstructionBase, IVariable, IOperand, IExpression
 {

@@ -1,5 +1,4 @@
-﻿
-namespace Cable.ShaderBuilder.Development;
+﻿namespace Cable.Data.Types.Shaders;
 
 public abstract class MathOperation : ShaderInstructionBase, IExpression, IOperand
 {

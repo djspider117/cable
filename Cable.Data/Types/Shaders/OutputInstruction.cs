@@ -1,4 +1,4 @@
-﻿namespace Cable.ShaderBuilder.Development;
+﻿namespace Cable.Data.Types.Shaders;
 
 public class OutputInstruction : ShaderInstructionBase, IOutput
 {
@@ -11,7 +11,7 @@ public class OutputInstruction : ShaderInstructionBase, IOutput
     {
         if (InputVec4 != null)
         {
-            string decl = string.Empty;
+            var decl = string.Empty;
             if (InputVec4.HasDeclarations)
             {
                 var d = InputVec4.Declarations.Select(x => string.Join("\r\n", x.Declarations));
@@ -23,7 +23,7 @@ public class OutputInstruction : ShaderInstructionBase, IOutput
 
         if (InputVec3 != null)
         {
-            string decl = string.Empty;
+            var decl = string.Empty;
             if (InputVec3.HasDeclarations)
             {
                 var d = InputVec3.Declarations.Select(x => string.Join("\r\n", x.GetDeclarationTextx()));
