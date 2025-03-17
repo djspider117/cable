@@ -46,13 +46,31 @@
             </Button>
         </StackPanel>
 
-        <Canvas x:Name="pnlNodeContainer" Background="#55000000" Grid.Row="1"
-                ClipToBounds="True" />
+        <Canvas  Background="#55000000" Grid.Row="1" ClipToBounds="True" >
 
-        <Canvas x:Name="pnlConnectionsContainer" Grid.Row="1" ClipToBounds="True" />
+            <Canvas x:Name="pnlNodeContainer">
+                <Canvas.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform x:Name="nodeScaleTransform"/>
+                        <TranslateTransform x:Name="nodeTranslateTransform" />
+                    </TransformGroup>
+                </Canvas.RenderTransform>
+            </Canvas>
+
+            <Canvas x:Name="pnlConnectionsContainer">
+                <Canvas.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform x:Name="connScaleTransform"/>
+                        <TranslateTransform x:Name="connTranslateTransform" />
+                    </TransformGroup>
+                </Canvas.RenderTransform>
+            </Canvas>
+
+        </Canvas>
 
         <Canvas x:Name="pnlOverlayCanvas" Grid.Row="1">
-            <local:NodeEditor x:Name="nodeEditor" Canvas.Left="1350" Canvas.Top="25"/>
+            <local:NodeEditor x:Name="nodeEditor" Canvas.Left="1350" Canvas.Top="25"
+                              Visibility="Collapsed"/>
             <local:Monitor x:Name="monitor" Canvas.Left="980" Canvas.Top="450"/>
         </Canvas>
 

@@ -84,7 +84,6 @@ public partial class GraphEditor : UserControl, INodeViewResolver
         Loaded += GraphEditor_Loaded;
     }
 
-
     #region Event Handlers
 
     private async void GraphEditor_Loaded(object sender, RoutedEventArgs e)
@@ -112,12 +111,15 @@ public partial class GraphEditor : UserControl, INodeViewResolver
             }
         }
 
-        if (e.OriginalSource is FrameworkElement fe2)
+        if (e.ChangedButton == MouseButton.Left)
         {
-            var nv = fe2.FindVisualParent<NodeView>()!;
-            if (_pendingConnection == null)
+            if (e.OriginalSource is FrameworkElement fe2)
             {
-                Select(nv);
+                var nv = fe2.FindVisualParent<NodeView>()!;
+                if (_pendingConnection == null)
+                {
+                    Select(nv);
+                }
             }
         }
 
@@ -161,15 +163,35 @@ public partial class GraphEditor : UserControl, INodeViewResolver
         if (e.MiddleButton == MouseButtonState.Pressed && _lastMove != null)
         {
             var delta = e.GetPosition(this) - _lastMove;
-            foreach (NodeView item in pnlNodeContainer.Children)
-            {
-                item.X += delta.Value.X;
-                item.Y += delta.Value.Y;
-            }
+            connTranslateTransform.X += delta.Value.X;
+            connTranslateTransform.Y += delta.Value.Y;
+
+            nodeTranslateTransform.X += delta.Value.X;
+            nodeTranslateTransform.Y += delta.Value.Y;
+           
         }
 
         _lastMove = e.GetPosition(this);
     }
+
+    protected override void OnMouseWheel(MouseWheelEventArgs e)
+    {
+        base.OnMouseWheel(e);
+
+        var deltaVal = e.Delta / 1400.0d;
+
+        var pos = e.GetPosition(this);
+        connScaleTransform.CenterX = pos.X;
+        connScaleTransform.CenterY = pos.Y;
+        nodeScaleTransform.CenterX = pos.X;
+        nodeScaleTransform.CenterY = pos.Y;
+
+        connScaleTransform.ScaleX += deltaVal;
+        connScaleTransform.ScaleY += deltaVal;
+        nodeScaleTransform.ScaleX += deltaVal;
+        nodeScaleTransform.ScaleY += deltaVal;
+    }
+
     #endregion
 
     #region Save/Load

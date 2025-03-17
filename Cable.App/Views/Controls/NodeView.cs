@@ -19,6 +19,7 @@ public class NodeView : Control, ILayoutable
 
     private static int _zIndex = 0;
     private bool _isDragging;
+    private bool _wasDragged;
     private Point _initialHit;
 
     public DataConnector? PART_HeaderInput { get; set; }
@@ -108,7 +109,7 @@ public class NodeView : Control, ILayoutable
     {
         _isDragging = true;
         _initialHit = e.GetPosition(this);
-
+        _wasDragged = false;
         Panel.SetZIndex(this, ++_zIndex);
        
         base.OnMouseDown(e);
@@ -123,13 +124,14 @@ public class NodeView : Control, ILayoutable
         var deltaY = pos.Y - _initialHit.Y;
         ViewModel.X = deltaX;
         ViewModel.Y = deltaY;
+        _wasDragged = true;
 
         base.OnMouseMove(e);
     }
     protected override void OnMouseUp(MouseButtonEventArgs e)
     {
         _isDragging = false;
-
+        e.Handled = _wasDragged;
         base.OnMouseUp(e);
     }
 }
