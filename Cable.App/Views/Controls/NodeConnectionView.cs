@@ -18,6 +18,7 @@ public class NodeConnectionView : Control
 
     public NodeView Source { get => _source; set => _source = value; }
     public IConnection? Connection { get => _connection; set => _connection = value; }
+    public ConnectionViewModel ViewModel => _connectionViewModel;
 
     public NodeView? Destination
     {
@@ -96,8 +97,8 @@ public class NodeConnectionView : Control
         double internalOffsetX = 0;
         double internalOffsetY = 0;
 
-        double srcInternalOffsetX = 0;
-        double srcInternalOffsetY = 0;
+        //double srcInternalOffsetX = 0;
+        //double srcInternalOffsetY = 0;
         if (Destination == null)
         {
             var pos = Application.Current.MainWindow.PointToScreen(Mouse.GetPosition(Application.Current.MainWindow));
@@ -149,8 +150,8 @@ public class NodeConnectionView : Control
 
         var start = new Point(srcX, srcY);
         var end = new Point(destX, destY);
-        var control1 = new Point(srcX + (destX - srcX) / 3, srcY);
-        var control2 = new Point(destX - (destX - srcX) / 3, destY);
+        var control1 = new Point(srcX + ((destX - srcX) / 3), srcY);
+        var control2 = new Point(destX - ((destX - srcX) / 3), destY);
 
         var geometry = new StreamGeometry();
         using (StreamGeometryContext ctx = geometry.Open())

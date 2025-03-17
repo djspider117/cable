@@ -81,6 +81,7 @@ public class PropertyEditorGenerator : IIncrementalGenerator
         }
 
         var sb = new StringBuilder();
+        sb.AppendLine("#pragma warning disable");
         sb.AppendLine("using Cable.App.Extensions;");
         sb.AppendLine("using Cable.App.Models.Data;");
         sb.AppendLine("using Cable.App.Models.Data.Connections;");
@@ -151,14 +152,12 @@ public class PropertyEditorGenerator : IIncrementalGenerator
         sb.AppendLine("        }");
         sb.AppendLine("    }");
         sb.AppendLine("}");
-
         return sb.ToString();
     }
 
     private static void AddAutoGenStuff(StringBuilder sb, string propName, string fieldName, ITypeSymbol fieldType, string? editorType)
     {
-        if (editorType == null)
-            editorType = "InputOnlyEditor";
+        editorType ??= "InputOnlyEditor";
 
         var connectionName = $"{propName}Connection";
         sb.AppendLine($"        private IConnection<{fieldType.ToDisplayString()}>? _{connectionName};");

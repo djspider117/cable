@@ -12,16 +12,18 @@ public sealed class SKRendererTests
     {
         var scene = StaticSceneBuilder.BuildScene();
 
-        var _renderer = new SKRenderer();
-        _renderer.SetSize(new Vector2(1280, 720));
-        _renderer.PushFrame(scene);
+        var pipeline = new SKRenderPipeline();
+
+        var renderer = pipeline.Renderer;
+        renderer.SetSize(new Vector2(1280, 720));
+        renderer.PushFrame(scene);
 
         var info = new SKImageInfo(1280, 720, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
         using var surface = SKSurface.Create(info);
 
-        _renderer.SetCurrentFrameInfo(info);
-        _renderer.SetCurrentSurface(surface);
-        _renderer.Render(surface.Canvas);
+        renderer.SetCurrentFrameInfo(info);
+        renderer.SetCurrentSurface(surface);
+        renderer.Render(surface.Canvas);
 
         using var snapshot = surface.Snapshot();
         using var data = snapshot.Encode(SKEncodedImageFormat.Png, 100);

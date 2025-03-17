@@ -82,12 +82,13 @@ public class NodeView : Control, ILayoutable
         PART_HeaderOutput = GetTemplateChild(nameof(PART_HeaderOutput)) as DataConnector;
         PART_PropertyContainer = GetTemplateChild(nameof(PART_PropertyContainer)) as ItemsControl;
 
-        PART_HeaderOutput.ConnectionStarted += PART_HeaderOutput_ConnectionStarted;
+        if (PART_HeaderOutput != null)
+            PART_HeaderOutput.ConnectionStarted += PART_HeaderOutput_ConnectionStarted;
     }
 
     private void PART_HeaderOutput_ConnectionStarted(object? sender, EventArgs e)
     {
-        WeakReferenceMessenger.Default.Send<StartNodeConnectionMessage>(new (this));
+        WeakReferenceMessenger.Default.Send<StartNodeConnectionMessage>(new(this));
     }
 
     public DataConnector? GetDataConnectorForProperty(string? propertyName)
@@ -97,12 +98,9 @@ public class NodeView : Control, ILayoutable
 
         var dataObj = ViewModel.PropertyEditors.FirstOrDefault(x => x.DisplayName == propertyName);
         var ui = PART_PropertyContainer.ItemContainerGenerator.ContainerFromItem(dataObj);
-        if (PART_PropertyContainer.ItemContainerGenerator.ContainerFromItem(dataObj) is DependencyObject container)
-        {
-            return container.FindVisualChild<DataConnector>();
-        }
-
-        return null;
+        return PART_PropertyContainer.ItemContainerGenerator.ContainerFromItem(dataObj) is DependencyObject container
+            ? container.FindVisualChild<DataConnector>()
+            : null;
     }
 
     protected override void OnMouseDown(MouseButtonEventArgs e)
@@ -111,7 +109,7 @@ public class NodeView : Control, ILayoutable
         _initialHit = e.GetPosition(this);
         _wasDragged = false;
         Panel.SetZIndex(this, ++_zIndex);
-       
+
         base.OnMouseDown(e);
     }
     protected override void OnMouseMove(MouseEventArgs e)
